@@ -66,6 +66,29 @@
 .reader-pull{font:clamp(27px,4vw,42px)/1.35 Georgia,serif;color:#f2eadb;margin:70px 0;padding-left:28px;border-left:1px solid var(--g2)}
 .prelude{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:12%;pointer-events:none}
 .prelude-line{font:clamp(22px,4vw,38px)/1.4 Georgia,serif;color:#eee5d5;text-shadow:0 2px 24px #000;transition:opacity .7s ease}
+
+/* v0.14 visual language: symbolic, never expose art-direction text */
+.cine-art{position:absolute;inset:0;z-index:1;overflow:hidden;opacity:.95;transition:opacity 1.2s ease,transform 9s ease}
+.cine-art:before,.cine-art:after{content:"";position:absolute;transition:all 1.4s ease}
+.cine-art[data-kind="start_line"]:before{left:14%;right:14%;top:56%;height:3px;background:linear-gradient(90deg,transparent,#e7e0d3 15%,#e7e0d3 85%,transparent);box-shadow:0 0 30px rgba(255,255,255,.08)}
+.cine-art[data-kind="start_line"]:after{width:10px;height:10px;border-radius:50%;background:var(--g2);left:50%;top:calc(56% - 4px);box-shadow:0 0 45px rgba(217,163,67,.35)}
+.cine-art[data-kind="road"]:before{width:26%;height:120%;left:37%;top:20%;background:linear-gradient(90deg,transparent 48%,rgba(244,239,229,.22) 49%,rgba(244,239,229,.22) 51%,transparent 52%);transform:perspective(260px) rotateX(57deg)}
+.cine-art[data-kind="doorway"]:before{width:30%;height:56%;left:35%;top:22%;border:2px solid rgba(244,239,229,.28);box-shadow:0 0 80px rgba(217,163,67,.08) inset}
+.cine-art[data-kind="train_window"]:before{left:14%;right:14%;top:18%;bottom:18%;border:2px solid rgba(244,239,229,.2);background:linear-gradient(110deg,transparent 0 48%,rgba(255,255,255,.05) 49% 51%,transparent 52%)}
+.cine-art[data-kind="workbench"]:before{left:14%;right:14%;bottom:28%;height:4px;background:rgba(180,145,90,.33)}
+.cine-art[data-kind="workbench"]:after{width:48px;height:48px;border:2px solid rgba(244,239,229,.25);border-radius:8px;left:44%;bottom:30%}
+.cine-art[data-kind="empty_chair"]:before{width:90px;height:70px;border:2px solid rgba(244,239,229,.22);border-radius:12px 12px 5px 5px;left:calc(50% - 45px);top:38%}
+.cine-art[data-kind="empty_chair"]:after{width:80px;height:2px;background:rgba(244,239,229,.18);left:calc(50% - 40px);top:57%;box-shadow:-18px 56px 0 rgba(244,239,229,.14),18px 56px 0 rgba(244,239,229,.14)}
+.cine-art[data-kind="crowd_from_distance"]:before{width:8px;height:8px;border-radius:50%;background:rgba(244,239,229,.3);left:30%;top:45%;box-shadow:35px 12px 0 rgba(244,239,229,.2),70px -6px 0 rgba(244,239,229,.28),105px 18px 0 rgba(244,239,229,.18),140px -12px 0 rgba(244,239,229,.25),175px 10px 0 rgba(244,239,229,.18),210px -4px 0 rgba(244,239,229,.22)}
+.cine-art[data-kind="hands_object"]:before{width:86px;height:86px;border-radius:50%;border:2px solid rgba(217,163,67,.35);left:calc(50% - 43px);top:40%;box-shadow:0 0 60px rgba(217,163,67,.12)}
+.cine-art[data-kind="open_space"]:before{left:0;right:0;top:58%;height:1px;background:linear-gradient(90deg,transparent,rgba(244,239,229,.28),transparent)}
+.cine-art[data-kind="open_space"]:after{width:12px;height:12px;border-radius:50%;background:var(--g2);left:68%;top:32%;box-shadow:0 0 70px 25px rgba(217,163,67,.08)}
+.cine-art[data-kind="default"]:before{width:12px;height:12px;border-radius:50%;background:var(--g2);left:50%;top:48%;box-shadow:0 0 90px 35px rgba(217,163,67,.12)}
+.post-story{max-width:760px;margin:0 auto;padding:36px 0 72px}
+.post-story h1{font:clamp(34px,5vw,54px)/1.15 Georgia,serif}
+.post-story textarea{min-height:150px}
+.single-exit{margin-top:22px}
+.generation-audio-note{font-size:12px;color:var(--mut);margin-top:14px}
 </style></head><body><main id="app"></main><script>
 const app=document.querySelector('#app');
 const guestUid=localStorage.lantern_uid||(localStorage.lantern_uid='u-'+crypto.randomUUID());
@@ -136,81 +159,33 @@ findEl.onclick=()=>{S.moment=momentEl.value.trim();if(S.moment||S.path){getStory
 quietEl.onclick=()=>{S.screen='quiet';render()};
 sodEl.onclick=async()=>{let d=await api('/api/story-of-day');if(!d.entitlement.curated_allowed){errEl.textContent='Story of the Day counts as your weekly free story, and this week’s story has already been used.';return}S.path=d.preview.pathway;S.moment='Story of the Day';S.kind='curated';getStory()}}
 async function getStory(){
-  S.screen='finding';render(); const started=Date.now();
+  S.screen='finding';render();startAmbience(.045,S.path||'Surprise Me'); const started=Date.now();
   try{let d=await api('/api/light',{method:'POST',body:JSON.stringify({moment:S.moment,pathway:S.path,recent:S.recent,recent_titles:S.recentTitles,recent_fingerprints:S.recentFingerprints,just_this_moment:S.private,experience_kind:S.kind||'full'})});
-    stopFindingCopy();
+    stopFindingCopy();stopAmbience(1.1);
     const wait=Math.max(0,1800-(Date.now()-started)); if(wait) await new Promise(r=>setTimeout(r,wait));
     if(d.status==='limit'){S.limitKind=d.kind;S.screen='limit';render();return}
     if(d.status==='clarify'){S.question=d.question;S.screen='clarify';render();return}
     if(d.status==='no_match'){S.noMatch=d;S.screen='nomatch';render();return}
     if(d.story){S.story=d.story;S.profile=d.profile;if(d.entitlement&&S.me)S.me.entitlement=d.entitlement;S.recent=[d.story.id,...S.recent.filter(x=>x!==d.story.id)].slice(0,12);S.recentTitles=[d.story.title,...S.recentTitles.filter(x=>x!==d.story.title)].slice(0,12);if(d.story.fingerprint)S.recentFingerprints=[d.story.fingerprint,...S.recentFingerprints.filter(x=>x!==d.story.fingerprint)].slice(0,12);localStorage.lantern_recent=JSON.stringify(S.recent);localStorage.lantern_recent_titles=JSON.stringify(S.recentTitles);localStorage.lantern_recent_fingerprints=JSON.stringify(S.recentFingerprints);S.screen='story';render();return}
     throw new Error('Lantern did not receive a story.');
-  }catch(e){stopFindingCopy();S.screen='home';render();const errorBox=document.getElementById('err');if(errorBox)errorBox.textContent='Lantern could not find your story: '+e.message;}
+  }catch(e){stopFindingCopy();stopAmbience(.8);S.screen='home';render();const errorBox=document.getElementById('err');if(errorBox)errorBox.textContent='Lantern could not find your story: '+e.message;}
 }
 let findingCopyTimer=null;
 const findingCopy={
-  'Prepare Me':[
-    'Some moments ask us to step forward before we feel completely ready.',
-    'Preparation does not always arrive as confidence.',
-    'Sometimes the next step becomes clearer only after we begin.',
-    'There are stories about meeting uncertainty without pretending it is gone.',
-    'Finding something that can sit beside what is ahead.'
-  ],
-  'Encourage Me':[
-    'Sometimes the next step is enough.',
-    'Not every difficult chapter announces what it is building.',
-    'A little distance can change what we notice.',
-    'Looking for a story with enough light, but not too much certainty.',
-    'Some strength is easier to recognize in someone else first.'
-  ],
-  'Comfort Me':[
-    'Not every moment needs an answer.',
-    'Some stories do not fix anything. They simply stay.',
-    'Looking for something gentle enough for this moment.',
-    'There can be company without explanation.',
-    'Finding a story that leaves room for what you are carrying.'
-  ],
-  'Calm Me':[
-    'Nothing has to be solved all at once.',
-    'A story can give the mind somewhere else to stand for a moment.',
-    'Finding something quieter than the noise around this moment.',
-    'There is no need to rush the next few minutes.',
-    'Looking for a story with space in it.'
-  ],
-  'Inspire Me':[
-    'A life can change direction in unexpected places.',
-    'Sometimes possibility becomes visible through another person’s story.',
-    'Looking beyond the obvious story.',
-    'Some beginnings only make sense when we look back.',
-    'Finding something worth carrying into the rest of your day.'
-  ],
-  'Teach Me':[
-    'Some of the best stories begin with something we did not know.',
-    'Curiosity has a way of opening unexpected doors.',
-    'Looking for an idea you can discover rather than be told.',
-    'Some lessons arrive sideways.',
-    'Finding a story that leaves you with something to think about.'
-  ],
-  'Connect Me':[
-    'Across different lives, some experiences still find an echo.',
-    'The setting can be completely different and the feeling strangely familiar.',
-    'Looking for the human thread inside this moment.',
-    'Sometimes another person’s distance helps us recognize ourselves.',
-    'Finding a story that makes the world feel a little less separate.'
-  ],
-  'Surprise Me':[
-    'Some stories are worth finding by accident.',
-    'Going somewhere you may not have chosen yourself.',
-    'The unexpected story can sometimes be the one that stays.',
-    'Looking beyond the obvious connection.',
-    'Letting the story choose the direction this time.'
-  ]
-};
+ 'Prepare Me':['You do not have to feel ready before the story begins.','Some people discover what they can carry only after they start.','Looking for a story with movement in it.','Not advice. A different way to stand beside what is ahead.','The right story may begin somewhere completely unrelated.','Finding something grounded, not loud.','There is more than one way to meet uncertainty.','Let the next few minutes belong to someone else’s problem.','Looking for a story that earns its ending.','Something is taking shape.'],
+ 'Encourage Me':['Sometimes another person’s next step changes the view.','Looking for a story with honest movement, not slogans.','Not every comeback looks like a comeback at first.','Finding a story that does not pretend things are easy.','A small turn can matter more than a big speech.','Looking for something human enough to believe.','Some stories keep going without becoming heroic.','Let the story carry the momentum for a moment.','Finding something with a real obstacle and a real choice.','Almost there.'],
+ 'Comfort Me':['Nothing needs to be fixed before this story begins.','Looking for something gentle without becoming sentimental.','Some stories simply make room.','Finding a story that can stay beside what you are carrying.','No bright-side ending required.','Looking for something human and unforced.','Some moments need company more than explanation.','Finding a story with warmth but no pressure.','A quieter story is taking shape.','Stay here for a moment.'],
+ 'Calm Me':['Nothing is asking you to hurry.','Finding a story with room to breathe.','The story does not need to solve the whole day.','Looking for something steady and uncluttered.','A different situation can give the mind somewhere else to stand.','Keeping this one simple.','Finding a story that moves without rushing.','Let the next few minutes become smaller.','Something quieter is taking shape.','Stay with the sound for a moment.'],
+ 'Inspire Me':['Looking for something surprising enough to wake up curiosity.','Not a success speech. A real story with movement.','Some possibilities appear sideways.','Finding a person who did not know the ending either.','A good story changes direction before it changes us.','Looking beyond the obvious example.','Something unexpected is forming.','Finding a story worth following, not quoting.','There should be a reason to need the next minute.','Almost there.'],
+ 'Teach Me':['Starting with a question, not an answer.','Looking for something you can discover through events.','A useful idea is better when the story earns it.','Finding a story with a real problem to understand.','Curiosity first. Explanation later.','Looking for the moment something stopped making sense.','A story can teach without becoming a lesson.','Finding something concrete enough to remember.','Following the thread.','Almost there.'],
+ 'Connect Me':['Somewhere else, a completely different life may feel familiar.','Looking for the human thread without forcing the connection.','Distance can make recognition easier.','Finding a story about people, not a message.','Some connections arrive through ordinary moments.','Looking for something specific and human.','Another life is coming into focus.','Finding the place where two experiences quietly touch.','No explanation needed yet.','Almost there.'],
+ 'Surprise Me':['No destination this time.','Looking beyond the first obvious story.','Something unexpected should happen.','Finding a story you would not have asked for yourself.','Curiosity gets the first vote.','No lesson selected in advance.','Letting the story choose the road.','Looking for a hook worth following.','Something is beginning somewhere else.','Almost there.']
+}
 function stopFindingCopy(){if(findingCopyTimer){clearTimeout(findingCopyTimer);findingCopyTimer=null}}
 function finding(){
   stopFindingCopy();
   const lines=findingCopy[S.path]||['Finding something that fits this moment.','Looking beyond the obvious connection.','Giving the story a little room to find you.'];
-  shell(`<div class=finding>${logo()}<div class=light></div><h2>Finding the right story for this moment...</h2><p id=findingMicro class="lead finding-copy glow-in">${lines[0]}</p></div>`);
+  shell(`<div class=finding>${logo()}<div class=light></div><h2>Finding the right story for this moment...</h2><p id=findingMicro class="lead finding-copy glow-in">${lines[0]}</p><div class=generation-audio-note>Lantern is already beginning the experience.</div></div>`);
   let i=0;
   const rotate=()=>{
     findingCopyTimer=setTimeout(()=>{
@@ -253,61 +228,110 @@ async function completeStoryExit(choice){
   if(choice==='return'){S={...S,screen:'home',path:null,moment:'',story:null,profile:null,exitChoice:null};await loadMe();render()}
   else{S={...S,screen:'closed',path:null,moment:'',story:null,profile:null,exitChoice:null};render()}
 }
+function exitLabel(pathway){
+  return ['Encourage Me','Comfort Me','Calm Me'].includes(pathway)?'Close for now':'Return to Life'
+}
+function visualKind(v){const k=(v?.kind||'default').replace(/[^a-z0-9_]/gi,'_');return ['start_line','road','doorway','train_window','workbench','empty_chair','crowd_from_distance','hands_object','open_space'].includes(k)?k:'default'}
+function readingVisual(kind){return `<div class="reader-visual"><div class="cine-art" data-kind="${visualKind({kind})}"></div></div>`}
 function story(){
-  const s=S.story,p=S.profile||{},prov=s.provenance||{},saved=S.me?.saved?.some(x=>x.story_id===s.id);
-  const visualBeats=Array.isArray(p.visual_beats)&&p.visual_beats.length?p.visual_beats:[{at:0,description:'A distant pool of warm light in darkness'},{at:.35,description:'Weather moving across an open landscape'},{at:.7,description:'A small human-made object holding light'},{at:.92,description:'Open horizon before dawn'}];
+  const s=S.story,p=S.profile||{},saved=S.me?.saved?.some(x=>x.story_id===s.id);
+  const visualBeats=Array.isArray(p.visual_beats)&&p.visual_beats.length?p.visual_beats:[{at:0,kind:'default'},{at:.35,kind:'road'},{at:.7,kind:'hands_object'},{at:.92,kind:'open_space'}];
   const modeButtons=`<div class=modes><button data-mode=listen>Listen</button><button data-mode=read>Read</button><button data-mode=amb>Read + Soundscape</button></div>`;
   if(S.mode==='listen'){
-    shell(`${nav()}${logo()}${modeButtons}<div class=cine id=cine><div class=cine-scene id=cineScene></div><div class=cine-vignette></div><div class=cine-controls><span class=cine-status id=cineStatus>Ready when you are</span><div><button class="btn primary" id=cinePlay>Begin</button><button class="btn ghost" id=cineStop>Stop</button></div></div><div class=prelude><div class=prelude-line id=preludeLine></div></div><div class=cine-copy><div class=cine-kicker>${escapeHtml(p.pathway||S.path||'Lantern')}</div><div class=cine-line id=cineLine>${escapeHtml(s.title)}</div></div></div><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save'}</button><button class="btn primary" id=done>Finish story</button></div>`);
+    shell(`${nav()}${logo()}${modeButtons}<div class=cine id=cine><div class=cine-scene id=cineScene></div><div class="cine-art" id=cineArt data-kind="${visualKind(visualBeats[0])}"></div><div class=cine-vignette></div><div class=cine-controls><span class=cine-status id=cineStatus>Ready when you are</span><div><button class="btn primary" id=cinePlay>Begin</button><button class="btn ghost" id=cineStop>Stop</button></div></div><div class=prelude><div class=prelude-line id=preludeLine></div></div><div class=cine-copy><div class=cine-kicker>${escapeHtml(p.pathway||S.path||'Lantern')}</div><div class=cine-line id=cineLine>${escapeHtml(s.title)}</div></div></div><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save story'}</button></div>`);
     bindNav();bindStoryModes();bindCinematic(visualBeats);
   }else{
-    const paras=String(s.text||'').split(/\n\n+/).filter(Boolean);
-    const groups=[];for(let i=0;i<paras.length;i+=3)groups.push(paras.slice(i,i+3));
+    const paras=String(s.text||'').split(/\n\n+/).map(x=>x.trim()).filter(Boolean);
     const hook=paras.shift()||'';
-    const body=groups.map((g,i)=>`${i>0&&i%2===1?`<div class=reader-visual data-caption="${escapeHtml(visualBeats[Math.min(i,visualBeats.length-1)]?.description||'')}"></div>`:''}<div class=reader-section>${g.map(x=>`<p>${escapeHtml(x)}</p>`).join('')}</div>${i===1&&g[1]?`<div class=reader-pull>${escapeHtml(g[1])}</div>`:''}`).join('');
-    shell(`${nav()}${logo()}${modeButtons}<article class=reader><div class=ey>${escapeHtml(p.pathway||S.path||'LANTERN STORY')}</div><h1 class=reader-title>${escapeHtml(s.title)}</h1><div class=reader-hook>${escapeHtml(hook)}</div><div id=player></div>${body}</article><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save'}</button><button class="btn primary" id=done>Finish story</button></div>`);
-    bindNav();bindStoryModes();bindMode()
+    const groups=[];for(let i=0;i<paras.length;i+=3)groups.push(paras.slice(i,i+3));
+    const body=groups.map((g,i)=>`${i>0&&i%2===1?readingVisual(visualBeats[Math.min(i,visualBeats.length-1)]?.kind||'default'):''}<div class=reader-section>${g.map(x=>`<p>${escapeHtml(x)}</p>`).join('')}</div>${i===1&&g[1]?`<div class=reader-pull>${escapeHtml(g[1])}</div>`:''}`).join('');
+    shell(`${nav()}${logo()}${modeButtons}<article class=reader><div class=ey>${escapeHtml(p.pathway||S.path||'LANTERN STORY')}</div><h1 class=reader-title>${escapeHtml(s.title)}</h1><div class=reader-hook>${escapeHtml(hook)}</div><div id=player></div>${body}</article><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save story'}</button><button class="btn primary" id=readerDone>Continue</button></div>`);
+    bindNav();bindStoryModes();bindMode();document.getElementById('readerDone').onclick=()=>showPostStory()
   }
-  document.getElementById('save').onclick=async()=>{await api('/api/save',{method:'POST',body:JSON.stringify({story_id:s.id,title:s.title,provenance:prov.label||'',text:s.text})});await loadMe();document.getElementById('save').textContent='Saved'};
-  document.getElementById('done').onclick=()=>{stopNarration();stopAmbience();S.screen='quiet';render()}
+  document.getElementById('save').onclick=async()=>{await api('/api/save',{method:'POST',body:JSON.stringify({story:S.story})});await loadMe();document.getElementById('save').textContent='Saved'}
 }
-function bindStoryModes(){document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===S.mode);b.onclick=()=>{stopNarration();stopAmbience();S.mode=b.dataset.mode;story()}})}
+function bindStoryModes(){document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===S.mode);b.onclick=()=>{stopNarration();stopAmbience(.6);S.mode=b.dataset.mode;story()}})}
+function showPostStory(){
+  stopNarration();stopAmbience(1.8);S.screen='postStory';render()
+}
+function postStory(){
+  const pathway=S.profile?.pathway||S.path||'Surprise Me',label=exitLabel(pathway),close=label==='Close for now';
+  shell(`${nav()}${logo()}<section class=post-story><div class=ey>${escapeHtml(pathway)}</div><h1>Stay here for a moment.</h1><p class=lead>Write anything you want to keep from the story. Or leave it blank.</p><textarea id=postReflection placeholder="Private reflection — optional"></textarea><div class=row><button class="btn ghost" id=postSaveReflection>Save reflection</button><button class="btn ghost" id=postSaveStory>Save story</button></div><div class="single-exit"><button class="btn primary" id=postExit>${label}</button></div><div id=postFb class=feedback></div><div id=resonancePanel class="silence resonance-panel"><p class=lead>Did this meet you where you needed it?</p><div class=row style="justify-content:center">${['Yes, exactly','Somewhat','Not this time'].map(x=>`<button class="btn ghost rate">${x}</button>`).join('')}</div><div id=resFb class=feedback></div></div></section>`);bindNav();
+  const fb=document.getElementById('postFb'),reflection=document.getElementById('postReflection');
+  document.getElementById('postSaveReflection').onclick=async()=>{if(!reflection.value.trim())return;await api('/api/reflection',{method:'POST',body:JSON.stringify({story_id:S.story.id,text:reflection.value.trim()})});fb.textContent='Reflection saved privately.'};
+  document.getElementById('postSaveStory').onclick=async()=>{await api('/api/save',{method:'POST',body:JSON.stringify({story:S.story})});fb.textContent='Story saved.'};
+  document.getElementById('postExit').onclick=()=>{document.getElementById('postExit').disabled=true;const p=document.getElementById('resonancePanel');p.classList.add('show');p.scrollIntoView({behavior:'smooth',block:'center'})};
+  document.querySelectorAll('.rate').forEach(btn=>btn.onclick=async()=>{const rfb=document.getElementById('resFb');try{await api('/api/resonance',{method:'POST',body:JSON.stringify({story_id:S.story.id,rating:btn.textContent})});rfb.textContent='Thank you.';setTimeout(async()=>{const target=close?'closed':'home';S={...S,screen:target,path:null,moment:'',story:null,profile:null};if(target==='home')await loadMe();render()},550)}catch(e){rfb.textContent='Could not record feedback. Please try again.'}})
+}
 
 let speechAudio=null,speechUrls=[],narrationStopped=false;
-let ambienceDecks=[],ambienceTimer=null,ambienceGeneration=0;
+let scoreCtx=null,scoreMaster=null,scoreFilter=null,scoreNodes=[],scoreTimer=null,scorePathway=null;
 function stopNarration(){narrationStopped=true;if(speechAudio){try{speechAudio.pause();speechAudio.currentTime=0}catch(e){}speechAudio=null}speechUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});speechUrls=[]}
-function stopAmbience(){
-  ambienceGeneration++;if(ambienceTimer){clearTimeout(ambienceTimer);ambienceTimer=null}
-  ambienceDecks.forEach(a=>{try{a.pause();a.src=''}catch(e){}});ambienceDecks=[]
-}
-function soundPalette(){
-  const p=S.profile?.sound_palette;
-  const map={warm_piano:'soft_music',soft_strings:'soft_music',night_air:'night_room',rain_piano:'rain_music',open_horizon:'open_air'};
-  return map[p]||((S.profile?.pathway||S.path)==='Calm Me'?'rain_music':(S.profile?.pathway||S.path)==='Comfort Me'?'soft_music':'open_air')
-}
-function soundUrl(){
-  const p=soundPalette();
-  const files={soft_music:'/ambience/soft_music.wav',rain_music:'/ambience/rain_music.wav',night_room:'/ambience/night_room.wav',open_air:'/ambience/open_air.wav'};
-  return files[p]||files.soft_music
-}
-function fadeAudio(a,from,to,ms,onDone){
-  const steps=24,step=ms/steps;let i=0;a.volume=from;
-  const timer=setInterval(()=>{i++;a.volume=Math.max(0,Math.min(1,from+(to-from)*(i/steps)));if(i>=steps){clearInterval(timer);if(onDone)onDone()}},step)
-}
-function startAmbience(volume=.10){
-  stopAmbience();const generation=ambienceGeneration,src=soundUrl(),cross=3500;
-  const makeDeck=()=>{const a=new Audio(src);a.preload='auto';a.volume=0;return a};
-  let active=makeDeck(),standby=makeDeck();ambienceDecks=[active,standby];
-  const schedule=()=>{
-    if(generation!==ambienceGeneration)return;
-    const remaining=Math.max(5,(active.duration||20)-(active.currentTime||0));
-    ambienceTimer=setTimeout(async()=>{
-      if(generation!==ambienceGeneration)return;
-      try{standby.currentTime=0;standby.volume=0;await standby.play();fadeAudio(standby,0,volume,cross);fadeAudio(active,volume,0,cross,()=>{try{active.pause()}catch(e){}});[active,standby]=[standby,active];schedule()}catch(e){}
-    },Math.max(1000,remaining*1000-cross))
+function pathwaySoundProfile(pathway){
+  const p=pathway||S.profile?.pathway||S.path||'Surprise Me';
+  const profiles={
+    'Prepare Me':{root:146.83,intervals:[0,7,12,16],pulse:5.8,brightness:900,label:'grounded forward motion'},
+    'Encourage Me':{root:130.81,intervals:[0,4,7,12],pulse:7.4,brightness:1150,label:'warm lift'},
+    'Comfort Me':{root:110.00,intervals:[0,5,7,12],pulse:10.5,brightness:720,label:'warm holding space'},
+    'Calm Me':{root:98.00,intervals:[0,7,12,19],pulse:12.5,brightness:520,label:'slow spacious calm'},
+    'Inspire Me':{root:164.81,intervals:[0,7,11,14],pulse:6.7,brightness:1500,label:'gentle wonder'},
+    'Teach Me':{root:146.83,intervals:[0,3,7,10],pulse:8.2,brightness:1250,label:'curious movement'},
+    'Connect Me':{root:123.47,intervals:[0,5,9,12],pulse:9.0,brightness:850,label:'intimate warmth'},
+    'Surprise Me':{root:138.59,intervals:[0,7,10,14],pulse:7.1,brightness:1350,label:'open curiosity'},
+    'Quiet':{root:110.00,intervals:[0,7,12,16],pulse:13.5,brightness:600,label:'soft stillness'}
   };
-  active.addEventListener('loadedmetadata',schedule,{once:true});
-  active.play().then(()=>fadeAudio(active,0,volume,1800)).catch(()=>{})
+  const base={...(profiles[p]||profiles['Surprise Me'])},palette=S.profile?.sound_palette;
+  if(palette==='forward'){base.pulse=Math.max(4.8,base.pulse-.8);base.brightness+=180}
+  if(palette==='warm'){base.brightness=Math.max(520,base.brightness-120);base.pulse+=1.0}
+  if(palette==='quiet'){base.brightness=Math.max(420,base.brightness-260);base.pulse+=2.2}
+  if(palette==='wonder'){base.brightness+=320;base.intervals=[0,7,11,14]}
+  if(palette==='curious'){base.brightness+=120;base.intervals=[0,3,7,10]}
+  return base
+}
+function noteHz(root,semitones){return root*Math.pow(2,semitones/12)}
+function fadeParam(param,value,seconds){try{param.cancelScheduledValues(scoreCtx.currentTime);param.setTargetAtTime(value,scoreCtx.currentTime,Math.max(.03,seconds/4))}catch(e){}}
+function stopAmbience(fadeSeconds=1.8){
+  if(scoreTimer){clearInterval(scoreTimer);scoreTimer=null}
+  if(scoreMaster&&scoreCtx){fadeParam(scoreMaster.gain,0,fadeSeconds)}
+  const ctx=scoreCtx,nodes=[...scoreNodes];
+  setTimeout(()=>{nodes.forEach(n=>{try{n.stop&&n.stop()}catch(e){};try{n.disconnect&&n.disconnect()}catch(e){}});if(ctx){try{ctx.close()}catch(e){}}},Math.max(400,fadeSeconds*1000+250));
+  scoreCtx=null;scoreMaster=null;scoreFilter=null;scoreNodes=[];scorePathway=null
+}
+function startAmbience(volume=.075,pathway=null){
+  stopAmbience(.25);
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  scoreCtx=new AC();scorePathway=pathway||S.profile?.pathway||S.path||'Surprise Me';
+  const pr=pathwaySoundProfile(scorePathway);
+  scoreMaster=scoreCtx.createGain();scoreMaster.gain.value=0;scoreMaster.connect(scoreCtx.destination);
+  scoreFilter=scoreCtx.createBiquadFilter();scoreFilter.type='lowpass';scoreFilter.frequency.value=pr.brightness;scoreFilter.Q.value=.35;scoreFilter.connect(scoreMaster);
+  // Four quiet harmonic voices. They evolve continuously; there is no audio file and therefore no loop seam.
+  pr.intervals.forEach((semi,i)=>{
+    const osc=scoreCtx.createOscillator(),gain=scoreCtx.createGain();
+    osc.type=i%2?'sine':'triangle';osc.frequency.value=noteHz(pr.root,semi);
+    gain.gain.value=(i===0?.022:.010)/(i+1);
+    osc.connect(gain).connect(scoreFilter);osc.start();scoreNodes.push(osc,gain)
+  });
+  // Very soft high bell event created occasionally, pathway paced.
+  const bell=()=>{
+    if(!scoreCtx||!scoreMaster)return;
+    const now=scoreCtx.currentTime,osc=scoreCtx.createOscillator(),g=scoreCtx.createGain();
+    osc.type='sine';osc.frequency.value=noteHz(pr.root,24+(Math.random()>.5?7:12));
+    g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.012,now+.04);g.gain.exponentialRampToValueAtTime(.0001,now+2.4);
+    osc.connect(g).connect(scoreFilter);osc.start(now);osc.stop(now+2.6);scoreNodes.push(osc,g)
+  };
+  scoreTimer=setInterval(()=>{if(Math.random()>.35)bell()},pr.pulse*1000);
+  fadeParam(scoreMaster.gain,volume,2.2)
+}
+function shapeScore(segment,total){
+  if(!scoreCtx||!scoreMaster||!scoreFilter)return;
+  const frac=total<=1?1:segment/(total-1),pr=pathwaySoundProfile(scorePathway);
+  // Curiosity -> immersion -> tension -> release. Small changes, not soundtrack theatrics.
+  let vol=.07,bright=pr.brightness;
+  if(frac<.18){vol=.06;bright*=.82}
+  else if(frac<.52){vol=.073;bright*=1.0}
+  else if(frac<.76){vol=.052;bright*=.72}
+  else{vol=.066;bright*=.92}
+  fadeParam(scoreMaster.gain,vol,1.6);fadeParam(scoreFilter.frequency,bright,2.2)
 }
 function splitNarration(text,max=2500){
   const paras=String(text||'').split(/\n\n+/).filter(Boolean),out=[];let cur='';
@@ -320,7 +344,7 @@ async function fetchSpeechSegment(text,voice){
   const r=await fetch('/api/audio/speech',{method:'POST',headers,body:JSON.stringify({text,voice,profile:S.profile||{}})});
   if(!r.ok){let d={};try{d=await r.json()}catch(e){}throw new Error(d.error||'Narration could not be generated.')}return await r.blob()
 }
-async function startNarration(voice,statusEl,withAmbience=true,onSegment=null,onReady=null){
+async function startNarration(voice,statusEl,withAmbience=true,onSegment=null,onReady=null,onComplete=null){
   stopNarration();narrationStopped=false;
   const parts=splitNarration(S.story.text,1700),cache=new Map();let idx=0;
   const getPart=i=>{if(!cache.has(i))cache.set(i,fetchSpeechSegment(parts[i],voice));return cache.get(i)};
@@ -337,16 +361,15 @@ async function startNarration(voice,statusEl,withAmbience=true,onSegment=null,on
   const playNext=async()=>{
     if(narrationStopped)return;
     if(idx>=parts.length){
-      if(statusEl)statusEl.textContent='Story complete.';
-      // Let the score hold briefly, then resolve instead of looping forever.
-      setTimeout(()=>stopAmbience(),4500);
+      if(statusEl)statusEl.textContent='Letting the story land…';
+      setTimeout(()=>{stopAmbience(2.2);if(onComplete)setTimeout(onComplete,900)},3200);
       return
     }
     try{
       const current=idx,blob=await getPart(current);if(narrationStopped)return;idx++;
       if(idx+1<parts.length)getPart(idx+1);
       const url=URL.createObjectURL(blob);speechUrls.push(url);speechAudio=new Audio(url);speechAudio.volume=1;
-      speechAudio.onplay=()=>{if(statusEl)statusEl.textContent='Listening…';if(onSegment)onSegment(current,parts.length)};
+      speechAudio.onplay=()=>{if(statusEl)statusEl.textContent='Listening…';shapeScore(current,parts.length);if(onSegment)onSegment(current,parts.length)};
       speechAudio.onended=()=>setTimeout(playNext,500);
       speechAudio.onerror=()=>{if(statusEl)statusEl.textContent='Narration stopped unexpectedly.';stopAmbience()};
       await speechAudio.play()
@@ -364,15 +387,14 @@ const listenPrelude={
  'Surprise Me':['Do not choose the destination.','Just follow the first light.','See where the story takes you.']
 };
 function bindCinematic(visualBeats){
-  const status=document.getElementById('cineStatus'),line=document.getElementById('cineLine'),scene=document.getElementById('cineScene'),prelude=document.getElementById('preludeLine');
+  const status=document.getElementById('cineStatus'),title=document.getElementById('cineLine'),art=document.getElementById('cineArt'),prelude=document.getElementById('preludeLine');
   const voice=S.me?.prefs?.voice||'lantern';let preTimer=null,vi=0;
   const preLines=listenPrelude[S.profile?.pathway||S.path]||listenPrelude['Surprise Me'];
-  const runPrelude=()=>{let i=0;prelude.textContent=preLines[0];const rotate=()=>{preTimer=setTimeout(()=>{prelude.style.opacity=0;setTimeout(()=>{i=(i+1)%preLines.length;prelude.textContent=preLines[i];prelude.style.opacity=1;rotate()},650)},3350)};rotate()};
-  const visual=(seg,total)=>{const frac=total<=1?0:seg/(total-1);while(vi+1<visualBeats.length&&Number(visualBeats[vi+1].at||0)<=frac)vi++;line.style.opacity=0;setTimeout(()=>{line.textContent=visualBeats[vi]?.description||S.story.title;line.style.opacity=1;scene.classList.toggle('shift',vi%2===1)},700)};
-  document.getElementById('cinePlay').onclick=async()=>{runPrelude();try{await startNarration(voice,status,true,visual,()=>{if(preTimer)clearTimeout(preTimer);prelude.style.opacity=0;setTimeout(()=>{document.querySelector('.prelude').style.display='none'},800)})}catch(e){status.textContent=e.message}};
-  document.getElementById('cineStop').onclick=()=>{if(preTimer)clearTimeout(preTimer);stopNarration();stopAmbience();status.textContent='Stopped.'}
+  const runPrelude=()=>{let i=Math.floor(Math.random()*preLines.length);prelude.textContent=preLines[i];const rotate=()=>{preTimer=setTimeout(()=>{prelude.style.opacity=0;setTimeout(()=>{i=(i+1+Math.floor(Math.random()*Math.max(1,preLines.length-1)))%preLines.length;prelude.textContent=preLines[i];prelude.style.opacity=1;rotate()},650)},3350)};rotate()};
+  const visual=(seg,total)=>{const frac=total<=1?0:seg/(total-1);while(vi+1<visualBeats.length&&Number(visualBeats[vi+1].at||0)<=frac)vi++;art.style.opacity=.2;setTimeout(()=>{art.dataset.kind=visualKind(visualBeats[vi]);art.style.opacity=.95},700);if(seg>0)title.style.opacity=.15};
+  document.getElementById('cinePlay').onclick=async()=>{runPrelude();try{await startNarration(voice,status,true,visual,()=>{if(preTimer)clearTimeout(preTimer);prelude.style.opacity=0;setTimeout(()=>{const p=document.querySelector('.prelude');if(p)p.style.display='none'},800)},()=>showPostStory())}catch(e){status.textContent=e.message}};
+  document.getElementById('cineStop').onclick=()=>{if(preTimer)clearTimeout(preTimer);stopNarration();stopAmbience(.8);status.textContent='Stopped.'}
 }
-
 function bindMode(){
   const playerEl=document.getElementById('player');if(!playerEl)return;const voice=S.me?.prefs?.voice||'lantern',soundOn=S.me?.prefs?.sound!==false;
   if(S.mode==='listen'){
@@ -399,12 +421,11 @@ const quietLines=[
 ];
 function quiet(){
   if(quietTimer){clearTimeout(quietTimer);quietTimer=null}
-  shell(`${logo()}<div class=quiet-space><div class=light></div><div id=quietCopy class="quiet-copy finding-copy glow-in">${quietLines[0]}</div><div class="row quiet-actions"><button class="btn primary" id=quietSound>Start soft sound</button><button class="btn ghost" id=quietDone>Return to Life</button><button class="btn ghost" id=quietClose>Close for now</button></div></div>`);
-  S.profile={...(S.profile||{}),sound_palette:'warm_piano'};
-  let i=0;const rotate=()=>{quietTimer=setTimeout(()=>{const el=document.getElementById('quietCopy');if(!el)return;el.classList.remove('glow-in');el.classList.add('glow-out');setTimeout(()=>{const cur=document.getElementById('quietCopy');if(!cur)return;i=(i+1)%quietLines.length;cur.textContent=quietLines[i];cur.classList.remove('glow-out');cur.classList.add('glow-in');rotate()},650)},3350)};rotate();
-  document.getElementById('quietSound').onclick=()=>{startAmbience(.075);document.getElementById('quietSound').textContent='Sound playing'};
-  document.getElementById('quietDone').onclick=()=>{if(quietTimer)clearTimeout(quietTimer);stopAmbience();S.screen='home';render()};
-  document.getElementById('quietClose').onclick=()=>{if(quietTimer)clearTimeout(quietTimer);stopAmbience();S.screen='closed';render()}
+  shell(`${logo()}<div class=quiet-space><div class=light></div><div id=quietCopy class="quiet-copy finding-copy glow-in">${quietLines[0]}</div><div class="row quiet-actions"><button class="btn primary" id=quietClose>Close for now</button></div></div>`);
+  startAmbience(.055,'Quiet');
+  let i=Math.floor(Math.random()*quietLines.length),el=document.getElementById('quietCopy');el.textContent=quietLines[i];
+  const rotate=()=>{quietTimer=setTimeout(()=>{const e=document.getElementById('quietCopy');if(!e)return;e.classList.remove('glow-in');e.classList.add('glow-out');setTimeout(()=>{const cur=document.getElementById('quietCopy');if(!cur)return;i=(i+1)%quietLines.length;cur.textContent=quietLines[i];cur.classList.remove('glow-out');cur.classList.add('glow-in');rotate()},650)},3350)};rotate();
+  document.getElementById('quietClose').onclick=()=>{if(quietTimer)clearTimeout(quietTimer);stopAmbience(1.7);S.screen='closed';render()}
 }
 function library(){shell(`${nav()}${logo()}<h1>Your Library</h1><div class=ey>SAVED STORIES</div>${(S.me.saved||[]).map(x=>`<div class=card><strong>${x.title}</strong><div class=meta>${x.provenance}</div></div>`).join('')||'<p class=meta>No saved stories yet.</p>'}<div class=ey>RECENT</div>${(S.me.recent||[]).map(x=>`<div class=card><strong>${x.title}</strong><div class=meta>${x.provenance}</div></div>`).join('')||'<p class=meta>No recent stories yet.</p>'}`);bindNav()}
 function prefs(){let p=S.me.prefs||{};shell(`${nav()}${logo()}<h1>Preferences</h1><div class=card><label>Preferred experience<select id=mode><option value=read>Read</option><option value=listen>Listen</option><option value=amb>Read + Ambience</option></select></label><label>Narrator<select id=voicePref><option value=lantern>Lantern's Choice</option><option value=female>Female voice</option><option value=male>Male voice</option></select></label><label class=toggle><input type=checkbox id=sound ${p.sound?'checked':''}> Sound / ambience enabled</label><label>Faith preference<select id=faith><option value=neutral>Neutral</option><option value=include>Include faith stories</option><option value=avoid>Avoid faith stories</option></select></label><label>Language<input id=lang value="${escapeHtml(p.language||'English')}"></label><label class=toggle><input type=checkbox id=hist ${p.history?'checked':''}> Keep history</label><button class="btn primary" id=savePrefs>Save preferences</button><div id=prefFb class=feedback></div></div>`);bindNav();const modeEl=document.getElementById('mode'),voiceEl=document.getElementById('voicePref'),soundEl=document.getElementById('sound'),faithEl=document.getElementById('faith'),langEl=document.getElementById('lang'),histEl=document.getElementById('hist'),fb=document.getElementById('prefFb');modeEl.value=p.mode||'read';voiceEl.value=p.voice||'lantern';faithEl.value=p.faith||'neutral';document.getElementById('savePrefs').onclick=async()=>{try{await api('/api/preferences',{method:'POST',body:JSON.stringify({mode:modeEl.value,voice:voiceEl.value,sound:soundEl.checked,faith:faithEl.value,language:langEl.value,history:histEl.checked})});S.me.prefs={...S.me.prefs,mode:modeEl.value,voice:voiceEl.value,sound:soundEl.checked,faith:faithEl.value,language:langEl.value,history:histEl.checked};S.mode=modeEl.value;fb.textContent='Preferences saved.'}catch(e){fb.textContent='Could not save preferences: '+e.message}}}
@@ -440,5 +461,5 @@ function postValueRegister(){
 }
 function adminLogin(){shell(`${logo()}<h1>Admin Test Access</h1><p class=lead>Internal Lantern testing only.</p><input id=adminTokenInput type=password placeholder="Admin test token"><div class=row><button class="btn primary" id=adminVerify>Unlock</button><button class="btn ghost" id=adminBack>Back</button></div><div id=adminFb class=feedback></div>`);document.getElementById('adminBack').onclick=()=>{S.screen='home';render()};document.getElementById('adminVerify').onclick=async()=>{const token=document.getElementById('adminTokenInput').value.trim(),previous=adminToken;if(!token)return;adminToken=token;try{let d=await api('/api/admin/verify',{method:'POST',body:'{}'});if(d.admin){localStorage.lantern_admin_token=token;await loadMe();S.screen='home';render()}else{adminToken=previous;document.getElementById('adminFb').textContent='Invalid admin token.'}}catch(e){adminToken=previous;document.getElementById('adminFb').textContent='Admin access could not be verified.'}}}
 function adminPanel(){shell(`${nav()}${logo()}<h1>Alpha Admin Test</h1><p class=lead>Admin requests are unlimited. Simulate Guest, Free, or Paid state without changing normal caps for testers.</p><div class=card><div class=ey>SIMULATE PRODUCT STATE</div><div class=pills><button class=pill data-tier=guest>Guest</button><button class=pill data-tier=free>Free</button><button class=pill data-tier=paid>Paid</button></div><div id=adminState class=feedback></div></div><div class=card><div class=ey>VOICE AUDITION</div><p class=meta>Audition both candidate narrators with the same Lantern line before external Alpha.</p><div class=row><button class="btn ghost" id=previewFemale>Preview Female</button><button class="btn ghost" id=previewMale>Preview Male</button><button class="btn ghost" id=previewStop>Stop</button></div><div id=voicePreviewStatus class=feedback></div></div><button class="btn ghost" id=adminLogout>Lock admin tools</button>`);bindNav();document.querySelectorAll('[data-tier]').forEach(btn=>btn.onclick=async()=>{try{let d=await api('/api/admin/simulate-tier',{method:'POST',body:JSON.stringify({tier:btn.dataset.tier})});document.getElementById('adminState').textContent=d.ok?'Simulation set to '+btn.dataset.tier+'. Admin access itself remains unlimited.':'Could not change simulation.'}catch(e){document.getElementById('adminState').textContent='Could not change simulation.'}});const vpStatus=document.getElementById('voicePreviewStatus');const preview=async(choice)=>{const oldStory=S.story,oldProfile=S.profile;S.story={text:'Every person carries a story. Sometimes the right story arrives from somewhere we did not expect.'};S.profile={audio_style:'Warm, restrained, intimate storytelling. Natural pace. No announcer voice.'};await startNarration(choice,vpStatus,false);S.story=oldStory;S.profile=oldProfile};document.getElementById('previewFemale').onclick=()=>preview('female');document.getElementById('previewMale').onclick=()=>preview('male');document.getElementById('previewStop').onclick=()=>{stopNarration();vpStatus.textContent='Stopped.'};document.getElementById('adminLogout').onclick=()=>{adminToken='';delete localStorage.lantern_admin_token;S.screen='home';render()}}
-function render(){({ritual,home,finding,clarify,story,quiet,library,prefs,limit,nomatch,register,signin,otp,account,postValueRegister,adminLogin,adminPanel,closed}[S.screen])()}render();
+function render(){({ritual,home,finding,clarify,story,postStory,quiet,library,prefs,limit,nomatch,register,signin,otp,account,postValueRegister,adminLogin,adminPanel,closed}[S.screen])()}render();
 </script></body></html>

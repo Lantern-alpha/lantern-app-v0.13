@@ -225,108 +225,131 @@ def story_fingerprint(title,text):
 def generate(moment,profile):
     if not client:return None
 
-    # v0.13: premise first. Do not spend 1,000 words on an idea that has no engine.
-    premise_prompt=f"""You are the story director for LANTERN.
-USER MOMENT (context only, never mirror literally): {moment!r}
+    premise_prompt=f"""You are Lantern's story editor.
+USER MOMENT (context only; never mirror it literally): {moment!r}
 LIGHT PROFILE: {json.dumps(profile)}
 
-Create the STORY ENGINE before prose. The experience must feel closer to a tightly directed short film than an inspirational audiobook.
+Build an ACTUAL STORY a person would tell a friend, not a poem, literary vignette, meditation, parable, inspirational essay, or audiobook monologue.
 
-Rules:
-- Preserve Story Distance.
-- No interview story for interview anxiety, no presentation story for presentation anxiety, etc.
-- The cold open must create an unanswered question in the first 10 seconds.
-- Something must CHANGE or be DISCOVERED.
-- Avoid generic adversity/success plots and motivational morals.
-- The ending must create afterglow, not explain a lesson.
+Before prose, create a simple story engine:
+- a relatable person with a concrete situation
+- something they want / need / are trying to do
+- a problem, surprise, mistake, obstacle, discovery or unresolved question
+- 3-5 things that actually HAPPEN
+- an earned turn or realization through events
+- a restrained ending that leaves perspective/reassurance without stating a moral
+
+STYLE:
+- plain, conversational English
+- actions, decisions, dialogue and consequences over description
+- concrete details only when they matter
+- no decorative prose
+- no "pool of light", "steam curled", "muted silhouette", "faded photograph", "whispering wind", "golden glow", or similar literary filler
+- no abstract opening about life/courage/fear
+- preserve Story Distance: never reproduce the user's exact situation
+
+The first 15 seconds must make a listener ask "what happened next?"
 
 Return ONLY JSON:
 {{
- "cold_open":"2-3 vivid sentences that immediately create curiosity",
- "central_question":"what makes the audience need the next minute?",
- "character_want":"...",
- "stakes":"...",
- "escalation":["beat 1","beat 2","beat 3"],
- "turn":"unexpected but earned turn/revelation",
- "release":"how tension changes without becoming a tidy victory",
- "afterglow":"emotional residue in one phrase",
- "visual_motifs":["5-8 atmospheric visual motifs/objects/places, no talking heads"],
- "sound_motifs":["3-5 restrained sound/music ideas"],
- "voice_choice":"female|male"
+ "cold_open":"2-4 plain conversational sentences starting in the middle of something happening",
+ "central_question":"the simple unanswered question pulling us forward",
+ "character":"who we are following, in one sentence",
+ "goal":"what they are trying to do",
+ "complication":"what makes it difficult/interesting",
+ "events":["event 1","event 2","event 3","event 4"],
+ "turn":"earned turn/discovery",
+ "afterglow":"what feeling remains, without moralizing",
+ "voice_choice":"female|male",
+ "sound_palette":"forward|warm|quiet|wonder|curious"
 }}"""
     premise=strip_json(client.responses.create(model=MODEL,input=premise_prompt).output_text)
-    if not premise or not premise.get("central_question") or not premise.get("cold_open"): return None
+    if not premise or not premise.get("central_question") or not premise.get("cold_open"):return None
 
-    p=f"""Write an ORIGINAL LANTERN STORY from this approved story engine.
+    story_prompt=f"""Write the Lantern story from this approved engine.
 
 USER MOMENT (context only): {moment!r}
 LIGHT PROFILE: {json.dumps(profile)}
 STORY ENGINE: {json.dumps(premise)}
 
 TARGET:
-A 5-7 minute immersive story written FOR THE EAR and FOR THE SCREEN. It should feel directed, not narrated at the listener.
+A compelling 5-7 minute spoken story, roughly 850-1100 words.
 
-NON-NEGOTIABLE:
-- 900-1200 words.
-- Start with the supplied cold-open idea immediately. No setup paragraph before it.
-- Keep the central question alive through the middle.
-- Use scene, behavior, sensory specificity, consequence, discovery and change.
-- Write in performance-friendly paragraphs. Mix short impact lines with longer flowing passages.
-- Use punctuation and paragraph breaks to create rhythm and silence.
-- No motivational coaching, affirmation, sermon, self-help explanation, or moral.
-- Never tell the listener what the story "means."
-- Do not directly address the user's problem.
-- Final 2-4 lines: quiet, earned, memorable, spacious.
-- Fiction must be original.
+VOICE ON THE PAGE:
+It should sound like a very good storyteller speaking naturally to another person.
+NOT literary. NOT poetic. NOT overly descriptive. NOT an essay. NOT a motivational speech.
 
-VISUAL EXPERIENCE:
-Create 6-9 visual beats synchronized to the narrative. Visuals are atmospheric/symbolic: landscape, object, light, weather, architecture, hands only when essential, silhouette. Avoid slideshow literalism and talking heads.
-Each beat needs a short search/generation description and an approximate position as a fraction 0.0-1.0 through the story.
+RULES:
+- Start immediately with action/situation from the cold open.
+- Use short-to-medium paragraphs.
+- Dialogue is welcome when natural.
+- Every 30-45 seconds, something should happen, change, be learned, be decided, go wrong, become harder, become clearer, or surprise us.
+- Keep the central question alive until late in the story.
+- Favor verbs and human behavior over adjectives.
+- Do not describe ordinary light/weather/objects unless they affect what happens.
+- No decorative metaphors or poetic sentence fragments.
+- Do not write lines that sound designed to become Instagram quotes.
+- Preserve Story Distance.
+- No therapy framing, advice, affirmations, guaranteed outcomes, sermon, or explicit lesson.
+- Do not end with "and that's when...", "the lesson was...", "you've got this", or a question to the listener.
+- Ending should be simple, human, and earned.
 
-SOUND EXPERIENCE:
-Give 5-8 restrained cue beats. Use score, silence and selective environmental effects. Never fill every second. Silence is a cue.
-Each cue needs approximate position 0.0-1.0 and direction.
+VISUAL DIRECTION:
+Return 5-7 VISUAL CATEGORIES only, for the interface to interpret internally.
+Do not write captions for the user. Use simple categories like "start_line", "empty_chair", "train_window", "workbench", "road", "doorway", "crowd_from_distance", "hands_object", "open_space".
+These are production metadata and must never appear as user-facing text.
 
 Return ONLY JSON:
 {{
- "title":"...",
+ "title":"clear, intriguing, non-poetic title",
  "story":"...",
- "landing":"return_to_life|close_for_now|silent",
+ "landing":"return_to_life|close_for_now",
  "voice_choice":"female|male",
- "audio_style":"specific acting/performance direction; intimate, rhythmic, variable pace; explicitly NOT audiobook delivery",
- "sound_palette":"warm_piano|soft_strings|night_air|rain_piano|open_horizon",
- "emotional_arc":["curiosity","immersion","tension","movement","release","afterglow"],
- "hook":"...",
- "visual_beats":[{{"at":0.0,"description":"..."}}],
- "sound_cues":[{{"at":0.0,"direction":"..."}}]
+ "audio_style":"natural spoken storytelling; rhythmic and conversational; vary pace with events; pause at turns; never audiobook or announcer delivery",
+ "sound_palette":"forward|warm|quiet|wonder|curious",
+ "visual_beats":[{{"at":0.0,"kind":"start_line"}}],
+ "hook":"plain-language story hook"
 }}"""
-    g=strip_json(client.responses.create(model=MODEL,input=p).output_text)
-    if g and not g.get("voice_choice"): g["voice_choice"]=premise.get("voice_choice","female")
+    g=strip_json(client.responses.create(model=MODEL,input=story_prompt).output_text)
+    if g and not g.get("voice_choice"):g["voice_choice"]=premise.get("voice_choice","female")
     return g
 
 def quality(moment,profile,story):
     if not client:return True
-    p=f"""You are Lantern's ruthless narrative editor.
+    prompt=f"""You are Lantern's ruthless story editor.
+
 USER MOMENT: {moment!r}
 PROFILE: {json.dumps(profile)}
 STORY:
 {story[:16000]}
 
-A Lantern story passes only if a listener would plausibly WANT to hear the next minute.
-Fail it for ANY of these:
-- generic motivational fiction, inspirational essay, parable, sermon, or self-help
-- weak opening with no curiosity/tension
+Reject the story if it feels like:
+- poetry, literary fiction, a meditation, a motivational essay, a parable, or a beautifully-worded monologue
+- too descriptive relative to what actually happens
+- generic inspirational AI writing
 - literal mirroring of the user's problem
-- generic character/problem/resolution
-- explaining the meaning instead of dramatizing it
-- predictable success ending or tidy moral
-- therapy/friend framing, diagnosis, consequential advice, preachiness
-- insufficient scene, specificity, movement, stakes, discovery, or emotional change
-- ending with advice, slogan, moral, or question to the listener
-Return ONLY JSON {{"pass":true|false,"reason":"brief reason","hook_score":1-10,"stay_score":1-10,"afterglow_score":1-10}}.
-Pass only if all three scores are at least 7."""
-    q=strip_json(client.responses.create(model=MODEL,input=p).output_text)
-    return bool(q.get("pass")) and min(q.get("hook_score",0),q.get("stay_score",0),q.get("afterglow_score",0))>=7
+- a character simply feeling bad, thinking, then realizing something
+- predictable adversity -> success -> moral
+- setup that takes too long before anything happens
+- decorative imagery ("pool of light", "steam curled", "muted silhouette", etc.)
+- an audiobook passage rather than something a person would naturally tell another person
+- advice, therapy, preaching, slogans, or explicit lessons
+
+A PASSING story has:
+1. a relatable human situation,
+2. a clear question/problem,
+3. events/actions/decisions,
+4. forward motion,
+5. at least one meaningful complication or surprise,
+6. a simple earned ending,
+7. plain conversational language.
+
+Return ONLY JSON:
+{{"pass":true|false,"relatable":1-10,"hook":1-10,"forward_motion":1-10,"plain_language":1-10,"stay_to_end":1-10,"reason":"brief"}}.
+Pass only if every numeric score is >= 7."""
+    q=strip_json(client.responses.create(model=MODEL,input=prompt).output_text)
+    scores=[q.get(k,0) for k in ("relatable","hook","forward_motion","plain_language","stay_to_end")]
+    return bool(q.get("pass")) and min(scores)>=7
 
 def entitlement(uid):
     if is_admin_request():
@@ -492,7 +515,7 @@ def light():
                 g2=generate(moment or f"Selected pathway: {profile['pathway']}",profile)
                 if g2 and quality(moment,profile,g2["story"]): g=g2; fp=story_fingerprint(g["title"],g["story"])
             story={"id":"gen-"+uuid.uuid4().hex[:12],"title":g["title"],"provenance":"AN ORIGINAL LANTERN STORY","text":g["story"],"landing":g.get("landing","return_to_life"),"fingerprint":fp};source="generate"
-            for k in ("voice_choice","audio_style","sound_palette","emotional_arc","hook","visual_beats","sound_cues"):
+            for k in ("voice_choice","audio_style","sound_palette","hook","visual_beats"):
                 if g.get(k):profile[k]=g[k]
     if not story:
         cand,_=retrieve({"pathway":"Surprise Me","gravity":"low","tone":"curious","distance":"distant"},recent)
