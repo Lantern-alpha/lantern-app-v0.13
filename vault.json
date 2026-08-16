@@ -1,0 +1,308 @@
+[
+  {
+    "id": "prep-door",
+    "pathway": "Prepare Me",
+    "title": "The Door Before the Room",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A prepared professional waits outside an important room and realizes readiness does not require certainty.",
+    "mechanisms": [
+      "anticipation",
+      "ordinary courage",
+      "preparation"
+    ],
+    "gravity": "low",
+    "tone": [
+      "warm",
+      "grounded"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "prep-runner",
+    "pathway": "Prepare Me",
+    "title": "The Runner at the Starting Line",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A runner mentally races mile sixteen before the start, then returns attention to the first step.",
+    "mechanisms": [
+      "anticipation",
+      "orientation",
+      "preparation"
+    ],
+    "gravity": "low",
+    "tone": [
+      "grounded",
+      "energizing"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "enc-line",
+    "pathway": "Encourage Me",
+    "title": "One More Line",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A writer keeps a simple tally of ordinary returns to the page when progress is hard to feel.",
+    "mechanisms": [
+      "continuation",
+      "discouragement",
+      "effort"
+    ],
+    "gravity": "low",
+    "tone": [
+      "warm",
+      "reflective"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "enc-bench",
+    "pathway": "Encourage Me",
+    "title": "The Bench at Mile Eight",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A walker at mile eight stops measuring the entire remaining distance and chooses only the next marker.",
+    "mechanisms": [
+      "continuation",
+      "effort",
+      "overwhelm"
+    ],
+    "gravity": "low",
+    "tone": [
+      "warm",
+      "grounded"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "comfort-cup",
+    "pathway": "Comfort Me",
+    "title": "The Cup That Stayed Warm",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "After a hard unresolved day, a person finds temporary comfort in a warm cup that asks nothing from them.",
+    "mechanisms": [
+      "comfort",
+      "carrying",
+      "unresolved"
+    ],
+    "gravity": "low",
+    "tone": [
+      "gentle",
+      "warm"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "comfort-library",
+    "pathway": "Comfort Me",
+    "title": "The Library in the Rain",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A person steps into a quiet library during rain and finds a place that requires no answer from them.",
+    "mechanisms": [
+      "comfort",
+      "rest",
+      "carrying"
+    ],
+    "gravity": "low",
+    "tone": [
+      "gentle",
+      "quiet"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "calm-tide",
+    "pathway": "Calm Me",
+    "title": "The Tide Between Waves",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "Watching the sea up close reveals that even constant motion contains small spaces between waves.",
+    "mechanisms": [
+      "calm",
+      "overwhelm",
+      "space"
+    ],
+    "gravity": "low",
+    "tone": [
+      "gentle",
+      "reflective"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "calm-potter",
+    "pathway": "Calm Me",
+    "title": "The Potter's Wheel",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A pottery student learns centered does not mean motionless; pressure becomes steadier rather than harder.",
+    "mechanisms": [
+      "calm",
+      "control",
+      "steadiness"
+    ],
+    "gravity": "low",
+    "tone": [
+      "gentle",
+      "grounded"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "inspire-table",
+    "pathway": "Inspire Me",
+    "title": "The First Table",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A community workshop grows from one unimpressive table and small repairs nobody thought mattered.",
+    "mechanisms": [
+      "inspiration",
+      "small beginnings",
+      "possibility"
+    ],
+    "gravity": "low",
+    "tone": [
+      "hopeful",
+      "warm"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "inspire-tree",
+    "pathway": "Inspire Me",
+    "title": "The Photograph That Took Ten Years",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A photographer stays with the same tree long enough to discover he has been documenting a changing world.",
+    "mechanisms": [
+      "inspiration",
+      "attention",
+      "creative persistence"
+    ],
+    "gravity": "low",
+    "tone": [
+      "curious",
+      "reflective"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "teach-snow",
+    "pathway": "Teach Me",
+    "title": "The Map That Changed the Street",
+    "provenance": "TRUE STORY",
+    "summary": "John Snow's 1854 cholera investigation shows how relationships between places, water and deaths became visible.",
+    "mechanisms": [
+      "discovery",
+      "patterns",
+      "evidence"
+    ],
+    "gravity": "medium",
+    "tone": [
+      "curious",
+      "investigative"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "teach-toys",
+    "pathway": "Teach Me",
+    "title": "The Toys That Crossed the Pacific",
+    "provenance": "TRUE STORY",
+    "summary": "Bath toys lost at sea became memorable accidental drifters that helped illustrate ocean currents.",
+    "mechanisms": [
+      "discovery",
+      "wonder",
+      "delight"
+    ],
+    "gravity": "low",
+    "tone": [
+      "playful",
+      "curious"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "connect-courtyard",
+    "pathway": "Connect Me",
+    "title": "The Light Across the Courtyard",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A kitchen light across a courtyard makes a new city feel slightly smaller without pretending a stranger is a friend.",
+    "mechanisms": [
+      "connection",
+      "belonging",
+      "shared presence"
+    ],
+    "gravity": "low",
+    "tone": [
+      "warm",
+      "gentle"
+    ],
+    "distance": [
+      "parallel",
+      "distant"
+    ]
+  },
+  {
+    "id": "connect-umbrella",
+    "pathway": "Connect Me",
+    "title": "The Shared Umbrella",
+    "provenance": "AN ORIGINAL LANTERN STORY",
+    "summary": "A stranger tilts an umbrella six inches and makes thirty wet seconds unexpectedly human.",
+    "mechanisms": [
+      "connection",
+      "ordinary kindness",
+      "shared presence"
+    ],
+    "gravity": "low",
+    "tone": [
+      "warm",
+      "light"
+    ],
+    "distance": [
+      "distant"
+    ]
+  },
+  {
+    "id": "surprise-toys",
+    "pathway": "Surprise Me",
+    "title": "The Pacific Shipment Nobody Ordered",
+    "provenance": "TRUE STORY",
+    "summary": "A strange but true bath-toy spill in the Pacific becomes a delightful science story.",
+    "mechanisms": [
+      "delight",
+      "curiosity",
+      "wonder"
+    ],
+    "gravity": "low",
+    "tone": [
+      "playful",
+      "curious"
+    ],
+    "distance": [
+      "distant"
+    ]
+  }
+]

@@ -1,0 +1,444 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070707"><title>Lantern MVP</title><link rel="icon" href="data:,">
+<style>
+:root{--bg:#070707;--iv:#f4efe5;--gold:#d9a343;--g2:#f2c66c;--mut:#a9adb5;--line:rgba(244,239,229,.12)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--iv);font-family:Arial,sans-serif}.shell{min-height:100vh;display:flex;justify-content:center;padding:22px}.panel{width:min(920px,100%);border:1px solid var(--line);border-radius:28px;padding:28px;background:var(--bg)}.logo{display:block;width:min(520px,95%);margin:auto;border-radius:0;background:var(--bg)}h1{font-weight:400;font-size:clamp(30px,5vw,52px)}.lead{color:#d8d3ca;line-height:1.7}.center{text-align:center}.ey{margin-top:23px;color:var(--g2);font-size:12px;letter-spacing:.15em}.pills,.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.pill,.btn,.mode{border-radius:999px;padding:11px 16px;cursor:pointer}.pill,.mode,.ghost{background:#0d1723;color:var(--iv);border:1px solid var(--line)}.primary{background:linear-gradient(#f0c873,#d9a343);color:#111722;border:0;font-weight:700}.pill.active,.mode.active{border-color:var(--gold);color:#ffd98c}textarea,input,select{width:100%;background:#0b111a;color:var(--iv);border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:10px}.finding{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.light{width:16px;height:16px;border-radius:50%;background:var(--g2);box-shadow:0 0 48px 18px rgba(217,163,67,.3);margin:22px;animation:p 2s infinite}@keyframes p{50%{transform:scale(1.2)}}.story{font:19px/1.9 Georgia,serif;max-width:780px;margin:auto}.story p{margin-bottom:1.2em}.tag,.meta{font-size:12px}.tag{color:var(--g2);letter-spacing:.14em}.meta{color:var(--mut)}.card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#0b111a}.nav{display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px}.silence{text-align:center;margin-top:34px;padding-top:28px;border-top:1px solid var(--line)}.feedback{color:var(--g2);min-height:22px;margin-top:10px}
+.finding-copy{min-height:74px;max-width:680px;display:flex;align-items:center;justify-content:center}
+.finding-copy.glow-in{animation:lanternGlowIn .8s ease forwards}
+.finding-copy.glow-out{animation:lanternGlowOut .7s ease forwards}
+@keyframes lanternGlowIn{0%{opacity:0;filter:blur(7px);text-shadow:0 0 0 rgba(242,198,108,0)}100%{opacity:1;filter:blur(0);text-shadow:0 0 22px rgba(242,198,108,.16)}}
+@keyframes lanternGlowOut{0%{opacity:1;filter:blur(0)}100%{opacity:0;filter:blur(7px)}}
+.story-experience{max-width:780px;margin:34px auto 0}
+.story-beat{font:19px/1.9 Georgia,serif;margin:0 auto;padding:30px 0 46px;max-width:720px}
+.story-beat p{margin:0 0 1.35em}
+.story-beat.opening{padding-top:12px}
+.story-beat.turn{padding:54px 0}
+.story-beat.landing{padding-bottom:64px}
+.story-emphasis{font:clamp(24px,4vw,36px)/1.45 Georgia,serif;text-align:center;color:#f4efe5;max-width:650px;margin:20px auto;padding:30px 10px}
+.story-atmosphere{height:88px;position:relative;margin:2px auto 22px;max-width:680px;overflow:hidden}
+.story-atmosphere:before{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:var(--g2);box-shadow:0 0 42px 15px rgba(217,163,67,.16);transform:translate(-50%,-50%)}
+.story-atmosphere:after{content:"";position:absolute;left:12%;right:12%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(244,239,229,.12),transparent)}
+.exit-choice{justify-content:center;margin-top:18px}
+.resonance-panel{display:none;opacity:0;transition:opacity .35s ease}
+.resonance-panel.show{display:block;opacity:1}
+.close-screen{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.account-grid .full{grid-column:1/-1}
+.auth-note{margin-top:14px;color:var(--mut);font-size:13px;line-height:1.6}
+.otp{font-size:28px;letter-spacing:.28em;text-align:center;font-variant-numeric:tabular-nums}
+.audio-console{border:1px solid var(--line);border-radius:18px;padding:16px;margin:14px 0;background:#0b111a}
+.audio-status{font-size:13px;color:var(--mut);min-height:20px;margin-top:9px}
+.audio-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.audio-row select{width:auto;min-width:180px;margin:0}.volume{width:150px;margin:0}
+.account-chip{font-size:12px;color:var(--g2);border:1px solid var(--line);border-radius:999px;padding:9px 12px}
+@media(max-width:700px){.account-grid{grid-template-columns:1fr}.account-grid .full{grid-column:auto}.audio-row select{width:100%}.volume{width:100%}}
+.toggle{display:flex;gap:8px;align-items:center;margin-top:15px}.toggle input{width:auto;margin:0}@media(max-width:700px){.shell{padding:0}.panel{min-height:100vh;border-radius:0;border-left:0;border-right:0;padding:18px}.story{font-size:18px}}
+
+.quiet-space{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.quiet-space:before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(217,163,67,.07),transparent 67%);animation:quietBreath 8s ease-in-out infinite}
+@keyframes quietBreath{0%,100%{transform:scale(.88);opacity:.45}50%{transform:scale(1.08);opacity:.85}}
+.quiet-copy{position:relative;z-index:2;min-height:90px;max-width:620px;display:flex;align-items:center;justify-content:center;font:clamp(22px,4vw,34px)/1.5 Georgia,serif}
+.quiet-actions{position:relative;z-index:2;margin-top:36px}
+.audio-console{position:relative}
+.audio-status{line-height:1.5}
+
+/* v0.13 Gold Experience */
+.cine{position:relative;min-height:72vh;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#030507;margin:18px 0}
+.cine-scene{position:absolute;inset:0;background:
+ radial-gradient(circle at 72% 32%,rgba(218,166,72,.16),transparent 14%),
+ radial-gradient(circle at 40% 65%,rgba(61,82,105,.20),transparent 34%),
+ linear-gradient(145deg,#020305,#09111a 56%,#020304);
+ transform:scale(1.02);transition:opacity 1.8s ease,transform 12s ease;opacity:.9}
+.cine-scene.shift{transform:scale(1.10) translate3d(-1.5%,1%,0)}
+.cine-vignette{position:absolute;inset:0;box-shadow:inset 0 0 160px 45px #000;pointer-events:none}
+.cine-copy{position:absolute;left:8%;right:8%;bottom:12%;z-index:3;max-width:700px}
+.cine-kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);margin-bottom:12px}
+.cine-line{font:clamp(26px,4.5vw,48px)/1.18 Georgia,serif;color:#f1eadc;text-shadow:0 3px 30px #000;min-height:1.2em;transition:opacity .8s ease}
+.cine-controls{position:absolute;z-index:5;top:18px;left:18px;right:18px;display:flex;gap:8px;justify-content:space-between;align-items:center}
+.cine-status{font-size:12px;color:#c9c1b4;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);padding:8px 11px;border-radius:999px}
+.reader{max-width:780px;margin:0 auto}
+.reader-title{font:clamp(42px,7vw,76px)/1.02 Georgia,serif;margin:36px 0 48px}
+.reader-hook{font:clamp(25px,4vw,38px)/1.35 Georgia,serif;color:#efe7d8;margin:40px 0 64px}
+.reader-section{font:20px/1.85 Georgia,serif;color:#ddd4c6;margin:0 0 52px}
+.reader-section p{margin:0 0 24px}
+.reader-visual{height:280px;border-radius:22px;margin:52px 0;background:
+ radial-gradient(circle at 65% 35%,rgba(218,166,72,.17),transparent 15%),
+ linear-gradient(135deg,#08111a,#020304 70%);box-shadow:inset 0 0 100px #000;position:relative;overflow:hidden}
+.reader-visual:after{content:attr(data-caption);position:absolute;left:28px;bottom:24px;right:28px;color:#bfb5a5;font-size:13px;letter-spacing:.04em}
+.reader-pull{font:clamp(27px,4vw,42px)/1.35 Georgia,serif;color:#f2eadb;margin:70px 0;padding-left:28px;border-left:1px solid var(--g2)}
+.prelude{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:12%;pointer-events:none}
+.prelude-line{font:clamp(22px,4vw,38px)/1.4 Georgia,serif;color:#eee5d5;text-shadow:0 2px 24px #000;transition:opacity .7s ease}
+</style></head><body><main id="app"></main><script>
+const app=document.querySelector('#app');
+const guestUid=localStorage.lantern_uid||(localStorage.lantern_uid='u-'+crypto.randomUUID());
+let adminToken=localStorage.lantern_admin_token||'';
+let authSession={access_token:localStorage.lantern_access_token||'',refresh_token:localStorage.lantern_refresh_token||'',expires_at:Number(localStorage.lantern_auth_expires_at||0),user:JSON.parse(localStorage.lantern_auth_user||'null')};
+let S={screen:'ritual',path:null,moment:'',story:null,profile:null,mode:'read',private:false,recent:JSON.parse(localStorage.lantern_recent||'[]'),recentTitles:JSON.parse(localStorage.lantern_recent_titles||'[]'),recentFingerprints:JSON.parse(localStorage.lantern_recent_fingerprints||'[]'),me:null,authDraft:null,exitChoice:null};
+function saveAuthSession(d){
+  if(d.access_token){authSession.access_token=d.access_token;localStorage.lantern_access_token=d.access_token}
+  if(d.refresh_token){authSession.refresh_token=d.refresh_token;localStorage.lantern_refresh_token=d.refresh_token}
+  if(d.user){authSession.user=d.user;localStorage.lantern_auth_user=JSON.stringify(d.user)}
+  const exp=Date.now()+Number(d.expires_in||3600)*1000;authSession.expires_at=exp;localStorage.lantern_auth_expires_at=String(exp)
+}
+function clearAuthSession(){authSession={access_token:'',refresh_token:'',expires_at:0,user:null};['lantern_access_token','lantern_refresh_token','lantern_auth_expires_at','lantern_auth_user'].forEach(k=>localStorage.removeItem(k))}
+async function refreshSession(){
+  if(!authSession.refresh_token)return false;
+  try{let r=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refresh_token:authSession.refresh_token})});let d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Session expired');saveAuthSession(d);return true}catch(e){clearAuthSession();return false}
+}
+async function restoreSession(){if(authSession.refresh_token&&(!authSession.access_token||Date.now()>authSession.expires_at-120000))await refreshSession()}
+async function api(url,opt={}){
+  if(authSession.refresh_token&&Date.now()>authSession.expires_at-120000)await refreshSession();
+  opt.headers={'Content-Type':'application/json','X-Lantern-User':guestUid,...(opt.headers||{})};
+  if(authSession.access_token)opt.headers['Authorization']='Bearer '+authSession.access_token;
+  if(adminToken)opt.headers['X-Lantern-Admin-Token']=adminToken;
+  let r=await fetch(url,opt),text=await r.text(),data={};try{data=text?JSON.parse(text):{}}catch(e){data={error:text||('HTTP '+r.status)}}
+  if(!r.ok)throw new Error(data.detail||data.error||data.message||('HTTP '+r.status));return data
+}
+async function loadMe(){
+  await restoreSession();S.me=await api('/api/me');if(S.me?.prefs?.mode)S.mode=S.me.prefs.mode;
+  if(Array.isArray(S.me?.recent)&&S.me.recent.length){const ids=S.me.recent.map(x=>x.story_id).filter(Boolean),titles=S.me.recent.map(x=>x.title).filter(Boolean);S.recent=[...new Set([...ids,...S.recent])].slice(0,20);S.recentTitles=[...new Set([...titles,...S.recentTitles])].slice(0,20)}
+}
+const groups=[['FOR WHAT’S AHEAD',['Prepare Me']],['FOR WHAT YOU’RE CARRYING',['Encourage Me','Comfort Me','Calm Me']],['FOR GROWTH & DISCOVERY',['Inspire Me','Teach Me','Connect Me']]];
+const shell=x=>app.innerHTML=`<div class="shell"><section class="panel">${x}</section></div>`;const logo=()=>`<img class="logo" src="/lantern-logo.jpg" alt="Lantern">`;
+async function loadMe(){S.me=await api('/api/me')}
+function ritual(){shell(`<div class=center>${logo()}<h1>Every person carries a story.</h1><p class=lead>Let’s find the one you need today.</p><button class="btn primary" id=enterLantern>Enter Lantern</button><div id=startError class=feedback></div></div>`);
+  document.getElementById('enterLantern').onclick=async()=>{
+    const btn=document.getElementById('enterLantern'),err=document.getElementById('startError');
+    btn.disabled=true;btn.textContent='Opening Lantern…';err.textContent='';
+    try{await loadMe();S.screen='home';render()}
+    catch(e){btn.disabled=false;btn.textContent='Enter Lantern';err.textContent=e.message||'Lantern could not open. Please try again.'}
+  }
+}
+function nav(){
+  const acct=S.me?.authenticated?`<button class="btn ghost" id=accountBtn>${escapeHtml(S.me?.profile?.first_name||'Account')}</button>`:'<button class="btn ghost" id=accountBtn>Sign in</button>';
+  return `<div class=nav><button class="btn ghost" id=lib>Library</button><button class="btn ghost" id=prefs>Preferences</button>${acct}${adminToken?'<button class="btn ghost" id=adminPanelBtn>Admin Test</button>':'<button class="btn ghost" id=adminLoginBtn>Admin</button>'}</div>`
+}
+function bindNav(){
+  const libBtn=document.getElementById('lib'),prefsBtn=document.getElementById('prefs'),accountBtn=document.getElementById('accountBtn'),adminLoginBtn=document.getElementById('adminLoginBtn'),adminPanelBtn=document.getElementById('adminPanelBtn');
+  if(libBtn)libBtn.onclick=async()=>{await loadMe();S.screen='library';render()};
+  if(prefsBtn)prefsBtn.onclick=async()=>{await loadMe();S.screen='prefs';render()};
+  if(accountBtn)accountBtn.onclick=()=>{S.screen=S.me?.authenticated?'account':'signin';render()};
+  if(adminLoginBtn)adminLoginBtn.onclick=()=>{S.screen='adminLogin';render()};
+  if(adminPanelBtn)adminPanelBtn.onclick=()=>{S.screen='adminPanel';render()}
+}
+function home(){let ent=S.me?.entitlement; shell(`${nav()}${logo()}<h1>What brings you here today?</h1>${S.me?.authenticated&&S.me?.profile?.first_name?`<p class=meta>Welcome back, ${escapeHtml(S.me.profile.first_name)}.</p>`:''}<textarea id=m placeholder="Tell Lantern what’s happening...">${S.moment}</textarea>${groups.map(([g,a])=>`<div class=ey>${g}</div><div class=pills>${a.map(x=>`<button class="pill ${S.path===x?'active':''}" data-p="${x}">${x}</button>`).join('')}</div>`).join('')}<div class=ey>OR LET LANTERN CHOOSE</div><div class=pills><button class=pill data-p="Surprise Me">Surprise Me</button><button class=pill id=quiet>Just stay quiet with me</button></div><label class=toggle><input type=checkbox id=priv ${S.private?'checked':''}> Just This Moment <span class=meta>— don’t add this experience to history.</span></label><div class=row><button class="btn primary" id=find>Find my story</button><button class="btn ghost" id=sod>Story of the Day</button></div><p class=meta>${ent?.state==='paid'?`Paid · ${ent.full_remaining} Full Lantern Moments remaining this month · curated unlimited`:ent?.state==='free'?`Free · ${ent.curated_remaining} curated this week · ${ent.full_remaining} Full Lantern Moment this month`:`Guest · ${ent?.full_remaining??2} Full Lantern Moments before registration`}</p><div id=err class=feedback></div>`);bindNav();
+const momentEl=document.getElementById('m');
+const privateEl=document.getElementById('priv');
+const findEl=document.getElementById('find');
+const quietEl=document.getElementById('quiet');
+const sodEl=document.getElementById('sod');
+const errEl=document.getElementById('err');
+document.querySelectorAll('[data-p]').forEach(x=>x.onclick=()=>{
+  S.moment=momentEl.value;S.path=x.dataset.p;S.kind=(S.path==='Surprise Me'?'curated':'full');
+  document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('active',p.dataset.p===S.path));
+});
+momentEl.oninput=e=>{S.moment=e.target.value;S.kind=(S.path==='Surprise Me'?'curated':'full')};
+privateEl.onchange=e=>S.private=e.target.checked;
+findEl.onclick=()=>{S.moment=momentEl.value.trim();if(S.moment||S.path){getStory()}else{errEl.textContent='Tell Lantern what is happening or choose a pathway first.'}};
+quietEl.onclick=()=>{S.screen='quiet';render()};
+sodEl.onclick=async()=>{let d=await api('/api/story-of-day');if(!d.entitlement.curated_allowed){errEl.textContent='Story of the Day counts as your weekly free story, and this week’s story has already been used.';return}S.path=d.preview.pathway;S.moment='Story of the Day';S.kind='curated';getStory()}}
+async function getStory(){
+  S.screen='finding';render(); const started=Date.now();
+  try{let d=await api('/api/light',{method:'POST',body:JSON.stringify({moment:S.moment,pathway:S.path,recent:S.recent,recent_titles:S.recentTitles,recent_fingerprints:S.recentFingerprints,just_this_moment:S.private,experience_kind:S.kind||'full'})});
+    stopFindingCopy();
+    const wait=Math.max(0,1800-(Date.now()-started)); if(wait) await new Promise(r=>setTimeout(r,wait));
+    if(d.status==='limit'){S.limitKind=d.kind;S.screen='limit';render();return}
+    if(d.status==='clarify'){S.question=d.question;S.screen='clarify';render();return}
+    if(d.status==='no_match'){S.noMatch=d;S.screen='nomatch';render();return}
+    if(d.story){S.story=d.story;S.profile=d.profile;if(d.entitlement&&S.me)S.me.entitlement=d.entitlement;S.recent=[d.story.id,...S.recent.filter(x=>x!==d.story.id)].slice(0,12);S.recentTitles=[d.story.title,...S.recentTitles.filter(x=>x!==d.story.title)].slice(0,12);if(d.story.fingerprint)S.recentFingerprints=[d.story.fingerprint,...S.recentFingerprints.filter(x=>x!==d.story.fingerprint)].slice(0,12);localStorage.lantern_recent=JSON.stringify(S.recent);localStorage.lantern_recent_titles=JSON.stringify(S.recentTitles);localStorage.lantern_recent_fingerprints=JSON.stringify(S.recentFingerprints);S.screen='story';render();return}
+    throw new Error('Lantern did not receive a story.');
+  }catch(e){stopFindingCopy();S.screen='home';render();const errorBox=document.getElementById('err');if(errorBox)errorBox.textContent='Lantern could not find your story: '+e.message;}
+}
+let findingCopyTimer=null;
+const findingCopy={
+  'Prepare Me':[
+    'Some moments ask us to step forward before we feel completely ready.',
+    'Preparation does not always arrive as confidence.',
+    'Sometimes the next step becomes clearer only after we begin.',
+    'There are stories about meeting uncertainty without pretending it is gone.',
+    'Finding something that can sit beside what is ahead.'
+  ],
+  'Encourage Me':[
+    'Sometimes the next step is enough.',
+    'Not every difficult chapter announces what it is building.',
+    'A little distance can change what we notice.',
+    'Looking for a story with enough light, but not too much certainty.',
+    'Some strength is easier to recognize in someone else first.'
+  ],
+  'Comfort Me':[
+    'Not every moment needs an answer.',
+    'Some stories do not fix anything. They simply stay.',
+    'Looking for something gentle enough for this moment.',
+    'There can be company without explanation.',
+    'Finding a story that leaves room for what you are carrying.'
+  ],
+  'Calm Me':[
+    'Nothing has to be solved all at once.',
+    'A story can give the mind somewhere else to stand for a moment.',
+    'Finding something quieter than the noise around this moment.',
+    'There is no need to rush the next few minutes.',
+    'Looking for a story with space in it.'
+  ],
+  'Inspire Me':[
+    'A life can change direction in unexpected places.',
+    'Sometimes possibility becomes visible through another person’s story.',
+    'Looking beyond the obvious story.',
+    'Some beginnings only make sense when we look back.',
+    'Finding something worth carrying into the rest of your day.'
+  ],
+  'Teach Me':[
+    'Some of the best stories begin with something we did not know.',
+    'Curiosity has a way of opening unexpected doors.',
+    'Looking for an idea you can discover rather than be told.',
+    'Some lessons arrive sideways.',
+    'Finding a story that leaves you with something to think about.'
+  ],
+  'Connect Me':[
+    'Across different lives, some experiences still find an echo.',
+    'The setting can be completely different and the feeling strangely familiar.',
+    'Looking for the human thread inside this moment.',
+    'Sometimes another person’s distance helps us recognize ourselves.',
+    'Finding a story that makes the world feel a little less separate.'
+  ],
+  'Surprise Me':[
+    'Some stories are worth finding by accident.',
+    'Going somewhere you may not have chosen yourself.',
+    'The unexpected story can sometimes be the one that stays.',
+    'Looking beyond the obvious connection.',
+    'Letting the story choose the direction this time.'
+  ]
+};
+function stopFindingCopy(){if(findingCopyTimer){clearTimeout(findingCopyTimer);findingCopyTimer=null}}
+function finding(){
+  stopFindingCopy();
+  const lines=findingCopy[S.path]||['Finding something that fits this moment.','Looking beyond the obvious connection.','Giving the story a little room to find you.'];
+  shell(`<div class=finding>${logo()}<div class=light></div><h2>Finding the right story for this moment...</h2><p id=findingMicro class="lead finding-copy glow-in">${lines[0]}</p></div>`);
+  let i=0;
+  const rotate=()=>{
+    findingCopyTimer=setTimeout(()=>{
+      const el=document.getElementById('findingMicro'); if(!el)return;
+      el.classList.remove('glow-in');el.classList.add('glow-out');
+      setTimeout(()=>{
+        const current=document.getElementById('findingMicro'); if(!current)return;
+        i=(i+1)%lines.length;current.textContent=lines[i];
+        current.classList.remove('glow-out');current.classList.add('glow-in');
+        rotate();
+      },700);
+    },4300);
+  };
+  rotate();
+}
+function clarify(){shell(`${logo()}<h1>${S.question}</h1><textarea id=clarifyAnswer></textarea><button class="btn primary" id=clarifyContinue>Continue</button>`);
+  document.getElementById('clarifyContinue').onclick=()=>{S.moment+='\\nClarification: '+document.getElementById('clarifyAnswer').value;getStory()}
+}
+function escapeHtml(x){return String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function storyReadingMarkup(text){
+  const paras=String(text||'').split(/\n\n+/).map(x=>x.trim()).filter(Boolean);
+  if(!paras.length)return '';
+  const groups=[]; const size=paras.length<=6?2:paras.length<=12?3:4;
+  for(let i=0;i<paras.length;i+=size)groups.push(paras.slice(i,i+size));
+  return groups.map((g,idx)=>{
+    const phase=idx===0?'opening':idx===groups.length-1?'landing':idx===Math.floor(groups.length*.6)?'turn':'';
+    let body=g.map((p,j)=>{
+      const words=p.split(/\s+/).length;
+      const emphasize=(words<=22 && (idx>0 || j>0));
+      return emphasize?`<div class=story-emphasis>${escapeHtml(p)}</div>`:`<p>${escapeHtml(p)}</p>`;
+    }).join('');
+    const atmosphere=(idx>0 && idx<groups.length)?'<div class=story-atmosphere aria-hidden=true></div>':'';
+    return `${atmosphere}<section class="story-beat ${phase}">${body}</section>`;
+  }).join('');
+}
+async function completeStoryExit(choice){
+  stopNarration();stopAmbience();
+  const firstGuestValue=S.me?.entitlement?.state==='guest'&&S.me?.entitlement?.full_remaining===1;
+  if(choice==='return'&&firstGuestValue){S={...S,screen:'postValueRegister',path:null,moment:'',story:null,profile:null,exitChoice:null};render();return}
+  if(choice==='return'){S={...S,screen:'home',path:null,moment:'',story:null,profile:null,exitChoice:null};await loadMe();render()}
+  else{S={...S,screen:'closed',path:null,moment:'',story:null,profile:null,exitChoice:null};render()}
+}
+function story(){
+  const s=S.story,p=S.profile||{},prov=s.provenance||{},saved=S.me?.saved?.some(x=>x.story_id===s.id);
+  const visualBeats=Array.isArray(p.visual_beats)&&p.visual_beats.length?p.visual_beats:[{at:0,description:'A distant pool of warm light in darkness'},{at:.35,description:'Weather moving across an open landscape'},{at:.7,description:'A small human-made object holding light'},{at:.92,description:'Open horizon before dawn'}];
+  const modeButtons=`<div class=modes><button data-mode=listen>Listen</button><button data-mode=read>Read</button><button data-mode=amb>Read + Soundscape</button></div>`;
+  if(S.mode==='listen'){
+    shell(`${nav()}${logo()}${modeButtons}<div class=cine id=cine><div class=cine-scene id=cineScene></div><div class=cine-vignette></div><div class=cine-controls><span class=cine-status id=cineStatus>Ready when you are</span><div><button class="btn primary" id=cinePlay>Begin</button><button class="btn ghost" id=cineStop>Stop</button></div></div><div class=prelude><div class=prelude-line id=preludeLine></div></div><div class=cine-copy><div class=cine-kicker>${escapeHtml(p.pathway||S.path||'Lantern')}</div><div class=cine-line id=cineLine>${escapeHtml(s.title)}</div></div></div><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save'}</button><button class="btn primary" id=done>Finish story</button></div>`);
+    bindNav();bindStoryModes();bindCinematic(visualBeats);
+  }else{
+    const paras=String(s.text||'').split(/\n\n+/).filter(Boolean);
+    const groups=[];for(let i=0;i<paras.length;i+=3)groups.push(paras.slice(i,i+3));
+    const hook=paras.shift()||'';
+    const body=groups.map((g,i)=>`${i>0&&i%2===1?`<div class=reader-visual data-caption="${escapeHtml(visualBeats[Math.min(i,visualBeats.length-1)]?.description||'')}"></div>`:''}<div class=reader-section>${g.map(x=>`<p>${escapeHtml(x)}</p>`).join('')}</div>${i===1&&g[1]?`<div class=reader-pull>${escapeHtml(g[1])}</div>`:''}`).join('');
+    shell(`${nav()}${logo()}${modeButtons}<article class=reader><div class=ey>${escapeHtml(p.pathway||S.path||'LANTERN STORY')}</div><h1 class=reader-title>${escapeHtml(s.title)}</h1><div class=reader-hook>${escapeHtml(hook)}</div><div id=player></div>${body}</article><div class=row><button class="btn ghost" id=save>${saved?'Saved':'Save'}</button><button class="btn primary" id=done>Finish story</button></div>`);
+    bindNav();bindStoryModes();bindMode()
+  }
+  document.getElementById('save').onclick=async()=>{await api('/api/save',{method:'POST',body:JSON.stringify({story_id:s.id,title:s.title,provenance:prov.label||'',text:s.text})});await loadMe();document.getElementById('save').textContent='Saved'};
+  document.getElementById('done').onclick=()=>{stopNarration();stopAmbience();S.screen='quiet';render()}
+}
+function bindStoryModes(){document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===S.mode);b.onclick=()=>{stopNarration();stopAmbience();S.mode=b.dataset.mode;story()}})}
+
+let speechAudio=null,speechUrls=[],narrationStopped=false;
+let ambienceDecks=[],ambienceTimer=null,ambienceGeneration=0;
+function stopNarration(){narrationStopped=true;if(speechAudio){try{speechAudio.pause();speechAudio.currentTime=0}catch(e){}speechAudio=null}speechUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});speechUrls=[]}
+function stopAmbience(){
+  ambienceGeneration++;if(ambienceTimer){clearTimeout(ambienceTimer);ambienceTimer=null}
+  ambienceDecks.forEach(a=>{try{a.pause();a.src=''}catch(e){}});ambienceDecks=[]
+}
+function soundPalette(){
+  const p=S.profile?.sound_palette;
+  const map={warm_piano:'soft_music',soft_strings:'soft_music',night_air:'night_room',rain_piano:'rain_music',open_horizon:'open_air'};
+  return map[p]||((S.profile?.pathway||S.path)==='Calm Me'?'rain_music':(S.profile?.pathway||S.path)==='Comfort Me'?'soft_music':'open_air')
+}
+function soundUrl(){
+  const p=soundPalette();
+  const files={soft_music:'/ambience/soft_music.wav',rain_music:'/ambience/rain_music.wav',night_room:'/ambience/night_room.wav',open_air:'/ambience/open_air.wav'};
+  return files[p]||files.soft_music
+}
+function fadeAudio(a,from,to,ms,onDone){
+  const steps=24,step=ms/steps;let i=0;a.volume=from;
+  const timer=setInterval(()=>{i++;a.volume=Math.max(0,Math.min(1,from+(to-from)*(i/steps)));if(i>=steps){clearInterval(timer);if(onDone)onDone()}},step)
+}
+function startAmbience(volume=.10){
+  stopAmbience();const generation=ambienceGeneration,src=soundUrl(),cross=3500;
+  const makeDeck=()=>{const a=new Audio(src);a.preload='auto';a.volume=0;return a};
+  let active=makeDeck(),standby=makeDeck();ambienceDecks=[active,standby];
+  const schedule=()=>{
+    if(generation!==ambienceGeneration)return;
+    const remaining=Math.max(5,(active.duration||20)-(active.currentTime||0));
+    ambienceTimer=setTimeout(async()=>{
+      if(generation!==ambienceGeneration)return;
+      try{standby.currentTime=0;standby.volume=0;await standby.play();fadeAudio(standby,0,volume,cross);fadeAudio(active,volume,0,cross,()=>{try{active.pause()}catch(e){}});[active,standby]=[standby,active];schedule()}catch(e){}
+    },Math.max(1000,remaining*1000-cross))
+  };
+  active.addEventListener('loadedmetadata',schedule,{once:true});
+  active.play().then(()=>fadeAudio(active,0,volume,1800)).catch(()=>{})
+}
+function splitNarration(text,max=2500){
+  const paras=String(text||'').split(/\n\n+/).filter(Boolean),out=[];let cur='';
+  for(const p of paras){if((cur+'\n\n'+p).length<=max)cur=cur?cur+'\n\n'+p:p;else{if(cur)out.push(cur);cur=p}}
+  if(cur)out.push(cur);return out
+}
+async function fetchSpeechSegment(text,voice){
+  await restoreSession();const headers={'Content-Type':'application/json','X-Lantern-User':guestUid};
+  if(authSession.access_token)headers['Authorization']='Bearer '+authSession.access_token;if(adminToken)headers['X-Lantern-Admin-Token']=adminToken;
+  const r=await fetch('/api/audio/speech',{method:'POST',headers,body:JSON.stringify({text,voice,profile:S.profile||{}})});
+  if(!r.ok){let d={};try{d=await r.json()}catch(e){}throw new Error(d.error||'Narration could not be generated.')}return await r.blob()
+}
+async function startNarration(voice,statusEl,withAmbience=true,onSegment=null,onReady=null){
+  stopNarration();narrationStopped=false;
+  const parts=splitNarration(S.story.text,1700),cache=new Map();let idx=0;
+  const getPart=i=>{if(!cache.has(i))cache.set(i,fetchSpeechSegment(parts[i],voice));return cache.get(i)};
+  if(!parts.length)return;
+  // Safety buffer: do not start on a single lucky chunk. Prepare two chunks first.
+  if(statusEl)statusEl.textContent='Opening the story…';
+  const initial=Math.min(2,parts.length);
+  const firstBlobs=await Promise.all(Array.from({length:initial},(_,i)=>getPart(i)));
+  if(narrationStopped)return;
+  if(withAmbience)startAmbience(.075);
+  if(onReady)onReady();
+  firstBlobs.forEach((b,i)=>cache.set(i,Promise.resolve(b)));
+  if(parts.length>initial)getPart(initial);
+  const playNext=async()=>{
+    if(narrationStopped)return;
+    if(idx>=parts.length){
+      if(statusEl)statusEl.textContent='Story complete.';
+      // Let the score hold briefly, then resolve instead of looping forever.
+      setTimeout(()=>stopAmbience(),4500);
+      return
+    }
+    try{
+      const current=idx,blob=await getPart(current);if(narrationStopped)return;idx++;
+      if(idx+1<parts.length)getPart(idx+1);
+      const url=URL.createObjectURL(blob);speechUrls.push(url);speechAudio=new Audio(url);speechAudio.volume=1;
+      speechAudio.onplay=()=>{if(statusEl)statusEl.textContent='Listening…';if(onSegment)onSegment(current,parts.length)};
+      speechAudio.onended=()=>setTimeout(playNext,500);
+      speechAudio.onerror=()=>{if(statusEl)statusEl.textContent='Narration stopped unexpectedly.';stopAmbience()};
+      await speechAudio.play()
+    }catch(e){if(statusEl)statusEl.textContent=e.message;stopAmbience()}
+  };await playNext()
+}
+const listenPrelude={
+ 'Prepare Me':['You do not need to know how this ends yet.','Just come into the story.','Something is already beginning.'],
+ 'Encourage Me':['For a moment, borrow another horizon.','You only need the next few minutes.','Let the story do the talking.'],
+ 'Comfort Me':['There is nothing to solve before this begins.','You can arrive exactly as you are.','Let the story make a little room.'],
+ 'Calm Me':['The next few minutes can be smaller than the day.','Nothing is asking you to hurry.','Come into something quieter.'],
+ 'Inspire Me':['There are doors we notice only after someone else opens one.','Follow the story before you name the lesson.','See where this goes.'],
+ 'Teach Me':['Begin with the question, not the answer.','There is something here worth noticing.','Follow the thread.'],
+ 'Connect Me':['Another life can be far away and still feel familiar.','Listen for the human thread.','The distance is part of the story.'],
+ 'Surprise Me':['Do not choose the destination.','Just follow the first light.','See where the story takes you.']
+};
+function bindCinematic(visualBeats){
+  const status=document.getElementById('cineStatus'),line=document.getElementById('cineLine'),scene=document.getElementById('cineScene'),prelude=document.getElementById('preludeLine');
+  const voice=S.me?.prefs?.voice||'lantern';let preTimer=null,vi=0;
+  const preLines=listenPrelude[S.profile?.pathway||S.path]||listenPrelude['Surprise Me'];
+  const runPrelude=()=>{let i=0;prelude.textContent=preLines[0];const rotate=()=>{preTimer=setTimeout(()=>{prelude.style.opacity=0;setTimeout(()=>{i=(i+1)%preLines.length;prelude.textContent=preLines[i];prelude.style.opacity=1;rotate()},650)},3350)};rotate()};
+  const visual=(seg,total)=>{const frac=total<=1?0:seg/(total-1);while(vi+1<visualBeats.length&&Number(visualBeats[vi+1].at||0)<=frac)vi++;line.style.opacity=0;setTimeout(()=>{line.textContent=visualBeats[vi]?.description||S.story.title;line.style.opacity=1;scene.classList.toggle('shift',vi%2===1)},700)};
+  document.getElementById('cinePlay').onclick=async()=>{runPrelude();try{await startNarration(voice,status,true,visual,()=>{if(preTimer)clearTimeout(preTimer);prelude.style.opacity=0;setTimeout(()=>{document.querySelector('.prelude').style.display='none'},800)})}catch(e){status.textContent=e.message}};
+  document.getElementById('cineStop').onclick=()=>{if(preTimer)clearTimeout(preTimer);stopNarration();stopAmbience();status.textContent='Stopped.'}
+}
+
+function bindMode(){
+  const playerEl=document.getElementById('player');if(!playerEl)return;const voice=S.me?.prefs?.voice||'lantern',soundOn=S.me?.prefs?.sound!==false;
+  if(S.mode==='listen'){
+    playerEl.innerHTML=`<div class=audio-console><div class=audio-row><label>Narrator <select id=listenVoice><option value=lantern>Lantern's Choice</option><option value=female>Female voice</option><option value=male>Male voice</option></select></label><button class="btn primary" id=playNarration>Play experience</button><button class="btn ghost" id=stopNarrationBtn>Stop</button></div><label class=toggle><input type=checkbox id=listenAmb ${soundOn?'checked':''}> Continuous story soundscape</label><div id=audioStatus class=audio-status>The voice and soundscape are directed as one experience.</div></div>`;
+    const voiceEl=document.getElementById('listenVoice'),status=document.getElementById('audioStatus'),amb=document.getElementById('listenAmb');voiceEl.value=voice;
+    document.getElementById('playNarration').onclick=()=>startNarration(voiceEl.value,status,amb.checked);
+    document.getElementById('stopNarrationBtn').onclick=()=>{stopNarration();stopAmbience();status.textContent='Stopped.'}
+  }else if(S.mode==='amb'){
+    playerEl.innerHTML=`<div class=audio-console><strong>Read + Soundscape</strong><p class=meta>A continuous, low sound bed follows the emotional tone while you read.</p><div class=audio-row><button class="btn primary" id=ambStart>Start soundscape</button><button class="btn ghost" id=ambStop>Stop</button><label>Volume <input class=volume id=ambVol type=range min=0 max=.22 step=.01 value=.09></label></div><div id=ambStatus class=audio-status></div></div>`;
+    const vol=document.getElementById('ambVol'),status=document.getElementById('ambStatus');
+    document.getElementById('ambStart').onclick=()=>{startAmbience(Number(vol.value));status.textContent='Soundscape playing continuously.'};
+    vol.oninput=()=>ambienceDecks.forEach(a=>{if(!a.paused)a.volume=Math.min(Number(vol.value),a.volume||Number(vol.value))});
+    document.getElementById('ambStop').onclick=()=>{stopAmbience();status.textContent='Soundscape stopped.'}
+  }else{stopNarration();stopAmbience();playerEl.innerHTML='<div class=audio-console><strong>Read</strong><p class=meta>Silent reading. Let the story set its own pace.</p></div>'}
+}
+let quietTimer=null;
+const quietLines=[
+  'You can stay here for a little while.',
+  'Nothing needs your answer right now.',
+  'Let this moment be smaller than the whole day.',
+  'There is nowhere else you need to get to in these few seconds.',
+  'Let the sound carry what words do not need to.',
+  'Stay as long as this feels useful.'
+];
+function quiet(){
+  if(quietTimer){clearTimeout(quietTimer);quietTimer=null}
+  shell(`${logo()}<div class=quiet-space><div class=light></div><div id=quietCopy class="quiet-copy finding-copy glow-in">${quietLines[0]}</div><div class="row quiet-actions"><button class="btn primary" id=quietSound>Start soft sound</button><button class="btn ghost" id=quietDone>Return to Life</button><button class="btn ghost" id=quietClose>Close for now</button></div></div>`);
+  S.profile={...(S.profile||{}),sound_palette:'warm_piano'};
+  let i=0;const rotate=()=>{quietTimer=setTimeout(()=>{const el=document.getElementById('quietCopy');if(!el)return;el.classList.remove('glow-in');el.classList.add('glow-out');setTimeout(()=>{const cur=document.getElementById('quietCopy');if(!cur)return;i=(i+1)%quietLines.length;cur.textContent=quietLines[i];cur.classList.remove('glow-out');cur.classList.add('glow-in');rotate()},650)},3350)};rotate();
+  document.getElementById('quietSound').onclick=()=>{startAmbience(.075);document.getElementById('quietSound').textContent='Sound playing'};
+  document.getElementById('quietDone').onclick=()=>{if(quietTimer)clearTimeout(quietTimer);stopAmbience();S.screen='home';render()};
+  document.getElementById('quietClose').onclick=()=>{if(quietTimer)clearTimeout(quietTimer);stopAmbience();S.screen='closed';render()}
+}
+function library(){shell(`${nav()}${logo()}<h1>Your Library</h1><div class=ey>SAVED STORIES</div>${(S.me.saved||[]).map(x=>`<div class=card><strong>${x.title}</strong><div class=meta>${x.provenance}</div></div>`).join('')||'<p class=meta>No saved stories yet.</p>'}<div class=ey>RECENT</div>${(S.me.recent||[]).map(x=>`<div class=card><strong>${x.title}</strong><div class=meta>${x.provenance}</div></div>`).join('')||'<p class=meta>No recent stories yet.</p>'}`);bindNav()}
+function prefs(){let p=S.me.prefs||{};shell(`${nav()}${logo()}<h1>Preferences</h1><div class=card><label>Preferred experience<select id=mode><option value=read>Read</option><option value=listen>Listen</option><option value=amb>Read + Ambience</option></select></label><label>Narrator<select id=voicePref><option value=lantern>Lantern's Choice</option><option value=female>Female voice</option><option value=male>Male voice</option></select></label><label class=toggle><input type=checkbox id=sound ${p.sound?'checked':''}> Sound / ambience enabled</label><label>Faith preference<select id=faith><option value=neutral>Neutral</option><option value=include>Include faith stories</option><option value=avoid>Avoid faith stories</option></select></label><label>Language<input id=lang value="${escapeHtml(p.language||'English')}"></label><label class=toggle><input type=checkbox id=hist ${p.history?'checked':''}> Keep history</label><button class="btn primary" id=savePrefs>Save preferences</button><div id=prefFb class=feedback></div></div>`);bindNav();const modeEl=document.getElementById('mode'),voiceEl=document.getElementById('voicePref'),soundEl=document.getElementById('sound'),faithEl=document.getElementById('faith'),langEl=document.getElementById('lang'),histEl=document.getElementById('hist'),fb=document.getElementById('prefFb');modeEl.value=p.mode||'read';voiceEl.value=p.voice||'lantern';faithEl.value=p.faith||'neutral';document.getElementById('savePrefs').onclick=async()=>{try{await api('/api/preferences',{method:'POST',body:JSON.stringify({mode:modeEl.value,voice:voiceEl.value,sound:soundEl.checked,faith:faithEl.value,language:langEl.value,history:histEl.checked})});S.me.prefs={...S.me.prefs,mode:modeEl.value,voice:voiceEl.value,sound:soundEl.checked,faith:faithEl.value,language:langEl.value,history:histEl.checked};S.mode=modeEl.value;fb.textContent='Preferences saved.'}catch(e){fb.textContent='Could not save preferences: '+e.message}}}
+function limit(){let e=S.me?.entitlement||{},guest=e.state==='guest';let msg=guest?'You’ve used your two Guest Full Lantern Moments.':(S.limitKind==='curated'?'Your curated story for this week has been used.':'Your Full Lantern Moment allowance for this month has been used.');shell(`${logo()}<h1>${msg}</h1><p class=lead>${guest?'Create your Lantern account to continue.':'Lantern will keep the limit clear before asking you to share another personal Moment.'}</p><div class=row>${guest?'<button class="btn primary" id=limitRegister>Create account</button>':''}<button class="btn ghost" id=limitBack>Return home</button></div>`);document.getElementById('limitBack').onclick=async()=>{await loadMe();S.screen='home';render()};if(guest)document.getElementById('limitRegister').onclick=()=>{S.screen='register';render()}}
+
+function nomatch(){shell(`${logo()}<div class=finding><div class=light></div><h1>I don’t want to give this moment the wrong story.</h1><p class=lead>Lantern can step away from personalization and choose something safely.</p><button class="btn primary" id=choose>Choose something for me</button><button class="btn ghost" id=nmhome>Return home</button></div>`);document.getElementById('choose').onclick=()=>{S.path='Surprise Me';S.moment='';S.kind='curated';getStory()};document.getElementById('nmhome').onclick=()=>{S.screen='home';render()}}
+function countrySelect(id){return `<select id="${id}"><option value="">Select country</option><option value="Afghanistan">Afghanistan</option><option value="Albania">Albania</option><option value="Algeria">Algeria</option><option value="American Samoa">American Samoa</option><option value="Andorra">Andorra</option><option value="Angola">Angola</option><option value="Anguilla">Anguilla</option><option value="Antarctica">Antarctica</option><option value="Antigua and Barbuda">Antigua and Barbuda</option><option value="Argentina">Argentina</option><option value="Armenia">Armenia</option><option value="Aruba">Aruba</option><option value="Australia">Australia</option><option value="Austria">Austria</option><option value="Azerbaijan">Azerbaijan</option><option value="Bahamas">Bahamas</option><option value="Bahrain">Bahrain</option><option value="Bangladesh">Bangladesh</option><option value="Barbados">Barbados</option><option value="Belarus">Belarus</option><option value="Belgium">Belgium</option><option value="Belize">Belize</option><option value="Benin">Benin</option><option value="Bermuda">Bermuda</option><option value="Bhutan">Bhutan</option><option value="Bolivia, Plurinational State of">Bolivia, Plurinational State of</option><option value="Bonaire, Sint Eustatius and Saba">Bonaire, Sint Eustatius and Saba</option><option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option><option value="Botswana">Botswana</option><option value="Bouvet Island">Bouvet Island</option><option value="Brazil">Brazil</option><option value="British Indian Ocean Territory">British Indian Ocean Territory</option><option value="Brunei Darussalam">Brunei Darussalam</option><option value="Bulgaria">Bulgaria</option><option value="Burkina Faso">Burkina Faso</option><option value="Burundi">Burundi</option><option value="Cabo Verde">Cabo Verde</option><option value="Cambodia">Cambodia</option><option value="Cameroon">Cameroon</option><option value="Canada">Canada</option><option value="Cayman Islands">Cayman Islands</option><option value="Central African Republic">Central African Republic</option><option value="Chad">Chad</option><option value="Chile">Chile</option><option value="China">China</option><option value="Christmas Island">Christmas Island</option><option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option><option value="Colombia">Colombia</option><option value="Comoros">Comoros</option><option value="Congo">Congo</option><option value="Congo, The Democratic Republic of the">Congo, The Democratic Republic of the</option><option value="Cook Islands">Cook Islands</option><option value="Costa Rica">Costa Rica</option><option value="Croatia">Croatia</option><option value="Cuba">Cuba</option><option value="Curaçao">Curaçao</option><option value="Cyprus">Cyprus</option><option value="Czechia">Czechia</option><option value="Côte d&#x27;Ivoire">Côte d&#x27;Ivoire</option><option value="Denmark">Denmark</option><option value="Djibouti">Djibouti</option><option value="Dominica">Dominica</option><option value="Dominican Republic">Dominican Republic</option><option value="Ecuador">Ecuador</option><option value="Egypt">Egypt</option><option value="El Salvador">El Salvador</option><option value="Equatorial Guinea">Equatorial Guinea</option><option value="Eritrea">Eritrea</option><option value="Estonia">Estonia</option><option value="Eswatini">Eswatini</option><option value="Ethiopia">Ethiopia</option><option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option><option value="Faroe Islands">Faroe Islands</option><option value="Fiji">Fiji</option><option value="Finland">Finland</option><option value="France">France</option><option value="French Guiana">French Guiana</option><option value="French Polynesia">French Polynesia</option><option value="French Southern Territories">French Southern Territories</option><option value="Gabon">Gabon</option><option value="Gambia">Gambia</option><option value="Georgia">Georgia</option><option value="Germany">Germany</option><option value="Ghana">Ghana</option><option value="Gibraltar">Gibraltar</option><option value="Greece">Greece</option><option value="Greenland">Greenland</option><option value="Grenada">Grenada</option><option value="Guadeloupe">Guadeloupe</option><option value="Guam">Guam</option><option value="Guatemala">Guatemala</option><option value="Guernsey">Guernsey</option><option value="Guinea">Guinea</option><option value="Guinea-Bissau">Guinea-Bissau</option><option value="Guyana">Guyana</option><option value="Haiti">Haiti</option><option value="Heard Island and McDonald Islands">Heard Island and McDonald Islands</option><option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option><option value="Honduras">Honduras</option><option value="Hong Kong">Hong Kong</option><option value="Hungary">Hungary</option><option value="Iceland">Iceland</option><option value="India">India</option><option value="Indonesia">Indonesia</option><option value="Iran, Islamic Republic of">Iran, Islamic Republic of</option><option value="Iraq">Iraq</option><option value="Ireland">Ireland</option><option value="Isle of Man">Isle of Man</option><option value="Israel">Israel</option><option value="Italy">Italy</option><option value="Jamaica">Jamaica</option><option value="Japan">Japan</option><option value="Jersey">Jersey</option><option value="Jordan">Jordan</option><option value="Kazakhstan">Kazakhstan</option><option value="Kenya">Kenya</option><option value="Kiribati">Kiribati</option><option value="Korea, Democratic People&#x27;s Republic of">Korea, Democratic People&#x27;s Republic of</option><option value="Korea, Republic of">Korea, Republic of</option><option value="Kuwait">Kuwait</option><option value="Kyrgyzstan">Kyrgyzstan</option><option value="Lao People&#x27;s Democratic Republic">Lao People&#x27;s Democratic Republic</option><option value="Latvia">Latvia</option><option value="Lebanon">Lebanon</option><option value="Lesotho">Lesotho</option><option value="Liberia">Liberia</option><option value="Libya">Libya</option><option value="Liechtenstein">Liechtenstein</option><option value="Lithuania">Lithuania</option><option value="Luxembourg">Luxembourg</option><option value="Macao">Macao</option><option value="Madagascar">Madagascar</option><option value="Malawi">Malawi</option><option value="Malaysia">Malaysia</option><option value="Maldives">Maldives</option><option value="Mali">Mali</option><option value="Malta">Malta</option><option value="Marshall Islands">Marshall Islands</option><option value="Martinique">Martinique</option><option value="Mauritania">Mauritania</option><option value="Mauritius">Mauritius</option><option value="Mayotte">Mayotte</option><option value="Mexico">Mexico</option><option value="Micronesia, Federated States of">Micronesia, Federated States of</option><option value="Moldova, Republic of">Moldova, Republic of</option><option value="Monaco">Monaco</option><option value="Mongolia">Mongolia</option><option value="Montenegro">Montenegro</option><option value="Montserrat">Montserrat</option><option value="Morocco">Morocco</option><option value="Mozambique">Mozambique</option><option value="Myanmar">Myanmar</option><option value="Namibia">Namibia</option><option value="Nauru">Nauru</option><option value="Nepal">Nepal</option><option value="Netherlands">Netherlands</option><option value="New Caledonia">New Caledonia</option><option value="New Zealand">New Zealand</option><option value="Nicaragua">Nicaragua</option><option value="Niger">Niger</option><option value="Nigeria">Nigeria</option><option value="Niue">Niue</option><option value="Norfolk Island">Norfolk Island</option><option value="North Macedonia">North Macedonia</option><option value="Northern Mariana Islands">Northern Mariana Islands</option><option value="Norway">Norway</option><option value="Oman">Oman</option><option value="Pakistan">Pakistan</option><option value="Palau">Palau</option><option value="Palestine, State of">Palestine, State of</option><option value="Panama">Panama</option><option value="Papua New Guinea">Papua New Guinea</option><option value="Paraguay">Paraguay</option><option value="Peru">Peru</option><option value="Philippines">Philippines</option><option value="Pitcairn">Pitcairn</option><option value="Poland">Poland</option><option value="Portugal">Portugal</option><option value="Puerto Rico">Puerto Rico</option><option value="Qatar">Qatar</option><option value="Romania">Romania</option><option value="Russian Federation">Russian Federation</option><option value="Rwanda">Rwanda</option><option value="Réunion">Réunion</option><option value="Saint Barthélemy">Saint Barthélemy</option><option value="Saint Helena, Ascension and Tristan da Cunha">Saint Helena, Ascension and Tristan da Cunha</option><option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option><option value="Saint Lucia">Saint Lucia</option><option value="Saint Martin (French part)">Saint Martin (French part)</option><option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option><option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option><option value="Samoa">Samoa</option><option value="San Marino">San Marino</option><option value="Sao Tome and Principe">Sao Tome and Principe</option><option value="Saudi Arabia">Saudi Arabia</option><option value="Senegal">Senegal</option><option value="Serbia">Serbia</option><option value="Seychelles">Seychelles</option><option value="Sierra Leone">Sierra Leone</option><option value="Singapore">Singapore</option><option value="Sint Maarten (Dutch part)">Sint Maarten (Dutch part)</option><option value="Slovakia">Slovakia</option><option value="Slovenia">Slovenia</option><option value="Solomon Islands">Solomon Islands</option><option value="Somalia">Somalia</option><option value="South Africa">South Africa</option><option value="South Georgia and the South Sandwich Islands">South Georgia and the South Sandwich Islands</option><option value="South Sudan">South Sudan</option><option value="Spain">Spain</option><option value="Sri Lanka">Sri Lanka</option><option value="Sudan">Sudan</option><option value="Suriname">Suriname</option><option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option><option value="Sweden">Sweden</option><option value="Switzerland">Switzerland</option><option value="Syrian Arab Republic">Syrian Arab Republic</option><option value="Taiwan, Province of China">Taiwan, Province of China</option><option value="Tajikistan">Tajikistan</option><option value="Tanzania, United Republic of">Tanzania, United Republic of</option><option value="Thailand">Thailand</option><option value="Timor-Leste">Timor-Leste</option><option value="Togo">Togo</option><option value="Tokelau">Tokelau</option><option value="Tonga">Tonga</option><option value="Trinidad and Tobago">Trinidad and Tobago</option><option value="Tunisia">Tunisia</option><option value="Turkmenistan">Turkmenistan</option><option value="Turks and Caicos Islands">Turks and Caicos Islands</option><option value="Tuvalu">Tuvalu</option><option value="Türkiye">Türkiye</option><option value="Uganda">Uganda</option><option value="Ukraine">Ukraine</option><option value="United Arab Emirates">United Arab Emirates</option><option value="United Kingdom">United Kingdom</option><option value="United States">United States</option><option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option><option value="Uruguay">Uruguay</option><option value="Uzbekistan">Uzbekistan</option><option value="Vanuatu">Vanuatu</option><option value="Venezuela, Bolivarian Republic of">Venezuela, Bolivarian Republic of</option><option value="Viet Nam">Viet Nam</option><option value="Virgin Islands, British">Virgin Islands, British</option><option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option><option value="Wallis and Futuna">Wallis and Futuna</option><option value="Western Sahara">Western Sahara</option><option value="Yemen">Yemen</option><option value="Zambia">Zambia</option><option value="Zimbabwe">Zimbabwe</option><option value="Åland Islands">Åland Islands</option></select>`}
+function register(){
+  shell(`${logo()}<h1>Make Lantern yours.</h1><p class=lead>So your stories, reflections and preferences can travel with you.</p><div class=account-grid><div><label>First name<input id=regFirst autocomplete=given-name placeholder="First name"></label></div><div><label>Email<input id=regEmail type=email autocomplete=email placeholder="you@example.com"></label></div><div class=full><label>Country${countrySelect('regCountry')}</label></div></div><div class=row><button class="btn primary" id=regContinue>Continue</button><button class="btn ghost" id=regSignin>Already have an account?</button></div><p class=auth-note>No password. Lantern verifies your email with a one-time code and keeps you signed in on this device.</p><div id=regFb class=feedback></div>`);
+  document.getElementById('regContinue').onclick=async()=>{const first=document.getElementById('regFirst').value.trim(),email=document.getElementById('regEmail').value.trim(),country=document.getElementById('regCountry').value,fb=document.getElementById('regFb');if(!first||!email||!country){fb.textContent='First name, email and country are required.';return}try{let d=await api('/api/auth/request-otp',{method:'POST',body:JSON.stringify({first_name:first,email,country,mode:'signup'})});S.authDraft={first_name:first,email:d.email||email,country,mode:'signup'};S.screen='otp';render()}catch(e){fb.textContent=e.message}};
+  document.getElementById('regSignin').onclick=()=>{S.screen='signin';render()}
+}
+function signin(){
+  shell(`${logo()}<h1>Welcome back.</h1><p class=lead>Enter your email and Lantern will send you a one-time verification code.</p><input id=signinEmail type=email autocomplete=email placeholder="you@example.com"><div class=row><button class="btn primary" id=signinContinue>Send code</button><button class="btn ghost" id=signinCreate>Create account</button></div><div id=signinFb class=feedback></div>`);
+  document.getElementById('signinContinue').onclick=async()=>{const email=document.getElementById('signinEmail').value.trim(),fb=document.getElementById('signinFb');try{let d=await api('/api/auth/request-otp',{method:'POST',body:JSON.stringify({email,mode:'signin'})});S.authDraft={email:d.email||email,mode:'signin'};S.screen='otp';render()}catch(e){fb.textContent=e.message}};
+  document.getElementById('signinCreate').onclick=()=>{S.screen='register';render()}
+}
+function otp(){
+  const email=S.authDraft?.email||'your email';shell(`${logo()}<h1>Check your email.</h1><p class=lead>Enter the verification code sent to <strong>${escapeHtml(email)}</strong>.</p><input id=otpCode class=otp inputmode=numeric autocomplete=one-time-code maxlength=8 placeholder="••••••"><div class=row><button class="btn primary" id=otpVerify>Verify & Continue</button><button class="btn ghost" id=otpBack>Back</button></div><div id=otpFb class=feedback></div>`);
+  document.getElementById('otpVerify').onclick=async()=>{const token=document.getElementById('otpCode').value.replace(/\s+/g,''),fb=document.getElementById('otpFb');try{let d=await api('/api/auth/verify-otp',{method:'POST',body:JSON.stringify({email:S.authDraft.email,token,guest_id:guestUid})});saveAuthSession(d);S.authDraft=null;await loadMe();S.screen='home';render()}catch(e){fb.textContent=e.message}};
+  document.getElementById('otpBack').onclick=()=>{S.screen=S.authDraft?.mode==='signin'?'signin':'register';render()}
+}
+function account(){
+  const p=S.me?.profile||{};shell(`${nav()}${logo()}<h1>${escapeHtml(p.first_name||'Your account')}</h1><div class=card><div class=meta>EMAIL</div><p>${escapeHtml(p.email||'')}</p><div class=meta>COUNTRY</div><p>${escapeHtml(p.country||'')}</p></div><button class="btn ghost" id=signOut>Sign out</button><div id=acctFb class=feedback></div>`);bindNav();
+  document.getElementById('signOut').onclick=async()=>{try{await api('/api/auth/signout',{method:'POST',body:'{}'})}catch(e){}clearAuthSession();await loadMe();S.screen='home';render()}
+}
+
+
+function postValueRegister(){
+  shell(`${logo()}<h1>This doesn’t have to be our first and last story.</h1><p class=lead>Make Lantern yours.</p><div class=row><button class="btn primary" id=makeYours>Create account</button><button class="btn ghost" id=notNow>Not now</button></div>`);
+  document.getElementById('makeYours').onclick=()=>{S.screen='register';render()};
+  document.getElementById('notNow').onclick=async()=>{await loadMe();S.screen='home';render()}
+}
+function adminLogin(){shell(`${logo()}<h1>Admin Test Access</h1><p class=lead>Internal Lantern testing only.</p><input id=adminTokenInput type=password placeholder="Admin test token"><div class=row><button class="btn primary" id=adminVerify>Unlock</button><button class="btn ghost" id=adminBack>Back</button></div><div id=adminFb class=feedback></div>`);document.getElementById('adminBack').onclick=()=>{S.screen='home';render()};document.getElementById('adminVerify').onclick=async()=>{const token=document.getElementById('adminTokenInput').value.trim(),previous=adminToken;if(!token)return;adminToken=token;try{let d=await api('/api/admin/verify',{method:'POST',body:'{}'});if(d.admin){localStorage.lantern_admin_token=token;await loadMe();S.screen='home';render()}else{adminToken=previous;document.getElementById('adminFb').textContent='Invalid admin token.'}}catch(e){adminToken=previous;document.getElementById('adminFb').textContent='Admin access could not be verified.'}}}
+function adminPanel(){shell(`${nav()}${logo()}<h1>Alpha Admin Test</h1><p class=lead>Admin requests are unlimited. Simulate Guest, Free, or Paid state without changing normal caps for testers.</p><div class=card><div class=ey>SIMULATE PRODUCT STATE</div><div class=pills><button class=pill data-tier=guest>Guest</button><button class=pill data-tier=free>Free</button><button class=pill data-tier=paid>Paid</button></div><div id=adminState class=feedback></div></div><div class=card><div class=ey>VOICE AUDITION</div><p class=meta>Audition both candidate narrators with the same Lantern line before external Alpha.</p><div class=row><button class="btn ghost" id=previewFemale>Preview Female</button><button class="btn ghost" id=previewMale>Preview Male</button><button class="btn ghost" id=previewStop>Stop</button></div><div id=voicePreviewStatus class=feedback></div></div><button class="btn ghost" id=adminLogout>Lock admin tools</button>`);bindNav();document.querySelectorAll('[data-tier]').forEach(btn=>btn.onclick=async()=>{try{let d=await api('/api/admin/simulate-tier',{method:'POST',body:JSON.stringify({tier:btn.dataset.tier})});document.getElementById('adminState').textContent=d.ok?'Simulation set to '+btn.dataset.tier+'. Admin access itself remains unlimited.':'Could not change simulation.'}catch(e){document.getElementById('adminState').textContent='Could not change simulation.'}});const vpStatus=document.getElementById('voicePreviewStatus');const preview=async(choice)=>{const oldStory=S.story,oldProfile=S.profile;S.story={text:'Every person carries a story. Sometimes the right story arrives from somewhere we did not expect.'};S.profile={audio_style:'Warm, restrained, intimate storytelling. Natural pace. No announcer voice.'};await startNarration(choice,vpStatus,false);S.story=oldStory;S.profile=oldProfile};document.getElementById('previewFemale').onclick=()=>preview('female');document.getElementById('previewMale').onclick=()=>preview('male');document.getElementById('previewStop').onclick=()=>{stopNarration();vpStatus.textContent='Stopped.'};document.getElementById('adminLogout').onclick=()=>{adminToken='';delete localStorage.lantern_admin_token;S.screen='home';render()}}
+function render(){({ritual,home,finding,clarify,story,quiet,library,prefs,limit,nomatch,register,signin,otp,account,postValueRegister,adminLogin,adminPanel,closed}[S.screen])()}render();
+</script></body></html>

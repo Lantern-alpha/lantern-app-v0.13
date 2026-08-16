@@ -1,0 +1,8 @@
+[project]
+name = "lantern-experiential-mvp"
+version = "0.11.0"
+requires-python = ">=3.12"
+dependencies = ["flask>=3.0","openai>=1.0","requests>=2.32"]
+
+[tool.vercel]
+entrypoint = "server:app"
